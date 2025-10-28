@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Редагувати роль бази даних</title>
+</head>
+<body>
+
+<h1>Редагувати роль</h1>
+
+<form th:action="@{'/databaseRoles/update/' + ${databaseRole.id}}" th:object="${databaseRole}" method="post">
+    <input type="hidden" th:field="*{id}">
+
+    <label for="name">Назва:</label>
+    <input type="text" id="name" th:field="*{name}" required>
+    <br><br>
+
+    <label for="database">База даних:</label>
+    <select id="database" th:field="*{database}">
+        <option th:value="">-- вибрати базу --</option>
+        <option th:each="db : ${databases}" th:value="${db.id}" 
+                th:text="${db.name}" 
+                th:selected="${db.id == databaseRole.database?.id}"></option>
+    </select>
+    <br><br>
+
+    <button type="submit">💾 Оновити</button>
+    <a th:href="@{/databaseRoles}">↩ Назад</a>
+</form>
+
+</body>
+</html>

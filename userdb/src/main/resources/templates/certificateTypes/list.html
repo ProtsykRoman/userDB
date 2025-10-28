@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Список типів сертифікатів</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<h1>Типи сертифікатів</h1>
+
+<a th:href="@{/certificate-types/new}">➕ Додати новий тип</a>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Назва</th>
+        <th>Дії</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="type : ${certificateTypes}">
+        <td th:text="${type.id}"></td>
+        <td th:text="${type.name}"></td>
+        <td>
+            <a th:href="@{'/certificate-types/edit/' + ${type.id}}">✏️ Редагувати</a> |
+            <a th:href="@{'/certificate-types/delete/' + ${type.id}}"
+               onclick="return confirm('Видалити цей тип сертифікату?');">🗑️ Видалити</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

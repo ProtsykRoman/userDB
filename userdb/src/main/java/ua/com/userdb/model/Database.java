@@ -23,7 +23,7 @@ public class Database {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Column(name="name")
+	@Column(name="name", nullable = false)
 	private String name;
 	@ManyToOne
 	@JoinColumn(name="dababase_id", referencedColumnName = "id")

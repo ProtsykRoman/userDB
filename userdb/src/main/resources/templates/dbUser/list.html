@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Список користувачів баз даних</title>
+</head>
+<body>
+
+<h1>Користувачі баз даних</h1>
+
+<a th:href="@{/dbUsers/new}">➕ Додати нового користувача</a>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Ім’я</th>
+        <th>Звання</th>
+        <th>Підрозділ</th>
+        <th>Ідентифікаційний номер</th>
+        <th>Дії</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${dbUsers}">
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.name}"></td>
+        <td th:text="${user.rank != null ? user.rank.name : '-'}"></td>
+        <td th:text="${user.department != null ? user.department.name : '-'}"></td>
+        <td th:text="${user.identificationNumber}"></td>
+        <td>
+            <a th:href="@{'/dbUsers/edit/' + ${user.id}}">✏️ Редагувати</a> |
+            <a th:href="@{'/dbUsers/delete/' + ${user.id}}"
+               onclick="return confirm('Видалити цього користувача?');">🗑️ Видалити</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

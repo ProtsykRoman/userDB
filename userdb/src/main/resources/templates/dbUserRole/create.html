@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Призначити роль користувачу</title>
+</head>
+<body>
+
+<h1>Призначити роль користувачу бази даних</h1>
+
+<form th:action="@{/dbUserRoles}" th:object="${dbUserRole}" method="post">
+
+    <label for="dbUser">Користувач:</label>
+    <select id="dbUser" th:field="*{dbUser}">
+        <option th:value="">-- вибрати користувача --</option>
+        <option th:each="u : ${dbUsers}" th:value="${u.id}" th:text="${u.name}"></option>
+    </select>
+    <br><br>
+
+    <label for="databaseRole">Роль бази даних:</label>
+    <select id="databaseRole" th:field="*{databaseRole}">
+        <option th:value="">-- вибрати роль --</option>
+        <option th:each="r : ${databaseRoles}" th:value="${r.id}"
+                th:text="${r.name + ' (' + (r.database != null ? r.database.name : '-') + ')'}"></option>
+    </select>
+    <br><br>
+
+    <button type="submit">💾 Зберегти</button>
+    <a th:href="@{/dbUserRoles}">↩ Назад</a>
+</form>
+
+</body>
+</html>

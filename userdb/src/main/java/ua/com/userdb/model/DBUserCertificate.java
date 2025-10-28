@@ -29,10 +29,10 @@ public class DBUserCertificate {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
 	@ManyToOne
-	@JoinColumn(name="dbuser_id")
+	@JoinColumn(name="dbuser_id", nullable = false)
 	private DBUser dbUser;
-	@ManyToMany
-	@JoinColumn(name="certificate_type_id")
+	@ManyToOne
+	@JoinColumn(name="certificate_type_id", nullable = false)
 	private CertificateType certificateType;
 	@Temporal(TemporalType.DATE)
 	private Date expirationDate;

@@ -23,13 +23,13 @@ public class DBUser {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Column(name = "name")
+	@Column(name = "name", nullable = false)
 	private String Name;
 	@ManyToOne
 	@JoinColumn(name = "rank_id", referencedColumnName = "id")
 	private Rank rank;
 	@ManyToOne
-	@JoinColumn(name = "department_id", referencedColumnName = "id")
+	@JoinColumn(name = "department_id", referencedColumnName = "id", nullable = false)
 	private Department department;
 	@Column(name = "identificationNumber")
 	private int identificationNumber;

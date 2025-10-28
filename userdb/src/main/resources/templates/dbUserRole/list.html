@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ролі користувачів баз даних</title>
+</head>
+<body>
+
+<h1>Ролі користувачів у базах даних</h1>
+
+<a th:href="@{/dbUserRoles/new}">➕ Додати роль користувачу</a>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Користувач</th>
+        <th>Роль бази даних</th>
+        <th>Назва бази</th>
+        <th>Дії</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="role : ${dbUserRoles}">
+        <td th:text="${role.id}"></td>
+        <td th:text="${role.dbUser != null ? role.dbUser.name : '-'}"></td>
+        <td th:text="${role.databaseRole != null ? role.databaseRole.name : '-'}"></td>
+        <td th:text="${role.databaseRole != null && role.databaseRole.database != null ? role.databaseRole.database.name : '-'}"></td>
+        <td>
+            <a th:href="@{'/dbUserRoles/edit/' + ${role.id}}">✏️ Редагувати</a> |
+            <a th:href="@{'/dbUserRoles/delete/' + ${role.id}}"
+               onclick="return confirm('Видалити цю роль користувача?');">🗑️ Видалити</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Список доступів користувачів</title>
+</head>
+<body>
+
+<h1>Доступи користувачів до баз даних</h1>
+
+<a th:href="@{/dbUserAccess/new}">➕ Додати новий доступ</a>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Користувач</th>
+        <th>База даних</th>
+        <th>Термін дії доступу</th>
+        <th>Дії</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="access : ${dbUserAccessList}">
+        <td th:text="${access.id}"></td>
+        <td th:text="${access.dbUser != null ? access.dbUser.name : '-'}"></td>
+        <td th:text="${access.database != null ? access.database.name : '-'}"></td>
+        <td th:text="${#dates.format(access.accessExpirationDate, 'yyyy-MM-dd')}"></td>
+        <td>
+            <a th:href="@{'/dbUserAccess/edit/' + ${access.id}}">✏️ Редагувати</a> |
+            <a th:href="@{'/dbUserAccess/delete/' + ${access.id}}"
+               onclick="return confirm('Видалити цей доступ?');">🗑️ Видалити</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Список звань</title>
+</head>
+<body>
+
+<h1>Список звань</h1>
+
+<a th:href="@{/ranks/new}">➕ Додати звання</a>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Назва</th>
+        <th>Дії</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="rank : ${ranks}">
+        <td th:text="${rank.id}"></td>
+        <td th:text="${rank.name}"></td>
+        <td>
+            <a th:href="@{'/ranks/edit/' + ${rank.id}}">✏️ Редагувати</a> |
+            <a th:href="@{'/ranks/delete/' + ${rank.id}}"
+               onclick="return confirm('Видалити це звання?');">🗑️ Видалити</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

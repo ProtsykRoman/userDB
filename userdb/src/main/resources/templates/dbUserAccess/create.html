@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Створити доступ користувача</title>
+</head>
+<body>
+
+<h1>Створити доступ користувача до бази даних</h1>
+
+<form th:action="@{/dbUserAccess}" th:object="${dbUserAccess}" method="post">
+
+    <label for="dbUser">Користувач:</label>
+    <select id="dbUser" th:field="*{dbUser}">
+        <option th:value="">-- вибрати користувача --</option>
+        <option th:each="u : ${dbUsers}" th:value="${u.id}" th:text="${u.name}"></option>
+    </select>
+    <br><br>
+
+    <label for="database">База даних:</label>
+    <select id="database" th:field="*{database}">
+        <option th:value="">-- вибрати базу даних --</option>
+        <option th:each="db : ${databases}" th:value="${db.id}" th:text="${db.name}"></option>
+    </select>
+    <br><br>
+
+    <label for="accessExpirationDate">Дата закінчення доступу:</label>
+    <input type="date" id="accessExpirationDate" th:field="*{accessExpirationDate}" required>
+    <br><br>
+
+    <button type="submit">💾 Зберегти</button>
+    <a th:href="@{/dbUserAccess}">↩ Назад</a>
+</form>
+
+</body>
+</html>

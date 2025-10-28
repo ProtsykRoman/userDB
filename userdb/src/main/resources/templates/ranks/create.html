@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Створити звання</title>
+</head>
+<body>
+
+<h1>Створити нове звання</h1>
+
+<form th:action="@{/ranks}" th:object="${rank}" method="post">
+    <label for="name">Назва:</label>
+    <input type="text" id="name" th:field="*{name}" placeholder="Введіть назву звання" required>
+    <br><br>
+
+    <button type="submit">💾 Зберегти</button>
+    <a th:href="@{/ranks}">↩ Назад</a>
+</form>
+
+</body>
+</html>

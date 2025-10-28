@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Список баз даних</title>
+</head>
+<body>
+
+<h1>Бази даних</h1>
+
+<a th:href="@{/databases/new}">➕ Додати нову базу</a>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Назва</th>
+        <th>Батьківська база</th>
+        <th>Дії</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="db : ${databases}">
+        <td th:text="${db.id}"></td>
+        <td th:text="${db.name}"></td>
+        <td th:text="${db.parentDatabase != null ? db.parentDatabase.name : '-'}"></td>
+        <td>
+            <a th:href="@{'/databases/edit/' + ${db.id}}">✏️ Редагувати</a> |
+            <a th:href="@{'/databases/delete/' + ${db.id}}"
+               onclick="return confirm('Видалити цю базу?');">🗑️ Видалити</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

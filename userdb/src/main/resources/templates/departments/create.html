@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Створити підрозділ</title>
+</head>
+<body>
+
+<h1>Створити новий підрозділ</h1>
+
+<form th:action="@{/departments}" th:object="${department}" method="post">
+
+    <label for="name">Назва:</label>
+    <input type="text" id="name" th:field="*{name}" placeholder="Введіть назву підрозділу" required>
+    <br><br>
+
+    <label for="parent">Батьківський підрозділ:</label>
+    <select id="parent" th:field="*{parent}">
+        <option th:value="">-- немає (верхній рівень) --</option>
+        <option th:each="p : ${departments}" th:value="${p.id}" th:text="${p.name}"></option>
+    </select>
+    <br><br>
+
+    <button type="submit">💾 Зберегти</button>
+    <a th:href="@{/departments}">↩ Назад</a>
+</form>
+
+</body>
+</html>
