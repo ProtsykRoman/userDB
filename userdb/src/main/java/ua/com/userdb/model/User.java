@@ -23,14 +23,14 @@ public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Column(name="username")
+	@Column(name="username", unique = true, nullable = false)
 	private String username;
-	@Column(name="role")
+	@Column(name="role", nullable = false)
 	private Role role;
-	@Column(name="password")
+	@Column(name="password", nullable = false)
 	private String password;
 	@Column(name="is_active")
-	private Boolean isActive;
+	private Boolean isActive = true;
 	@ManyToOne
 	@JoinColumn(name="department_id", referencedColumnName = "id")
 	private Department department;
