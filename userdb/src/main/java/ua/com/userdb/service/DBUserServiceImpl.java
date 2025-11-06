@@ -3,9 +3,12 @@ package ua.com.userdb.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import ua.com.userdb.dao.DBUserRepository;
 import ua.com.userdb.model.DBUser;
 
+@Service
 public class DBUserServiceImpl implements DBUserService {
 
 	private DBUserRepository dbUserRepository;

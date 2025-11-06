@@ -16,11 +16,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "ranks", schema = "userDB")
+@Table(name = "ranks", schema = "userdb")
 public class Rank {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	@Column(name = "name", nullable = false)
 	private String name;
 }

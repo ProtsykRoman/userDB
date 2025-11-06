@@ -21,7 +21,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="db_users_access", schema="userDB")
+@Table(name="db_users_access", schema="userdb")
 public class DBUserAccess {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

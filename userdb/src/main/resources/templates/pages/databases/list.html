@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title layout:fragment="title">Бази даних</title>
+    <link rel="stylesheet" th:href="@{/css/lists.css}">
+</head>
+<body>
+<div layout:fragment="content" class="list-container">
+
+    <h2>Список баз даних</h2>
+
+    <!-- Кнопка додавання нової бази -->
+    <a class="btn-add" th:href="@{/databases/new}">+ Додати нову базу даних</a>
+
+    <table class="list-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Назва</th>
+            <th>Дії</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="database : ${databases}">
+            <td th:text="${database.id}"></td>
+            <td th:text="${database.name}"></td>
+            <td class="table-actions">
+                <a th:href="@{'/databases/edit/' + ${database.id}}" class="btn-edit">Редагувати</a>
+                <a th:href="@{'/databases/delete/' + ${database.id}}"
+                   class="btn-delete"
+                   onclick="return confirm('Ви впевнені, що хочете видалити цю базу даних?');">
+                    Видалити
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

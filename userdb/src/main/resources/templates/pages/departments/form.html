@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title layout:fragment="title" th:text="${department.id} == null ? 'Створити відділ' : 'Редагувати відділ'"></title>
+    <link rel="stylesheet" th:href="@{/css/forms.css}">
+</head>
+<body>
+<div layout:fragment="content" class="form-container">
+
+    <h2 th:text="${department.id} == null ? 'Створити підрозділ' : 'Редагувати підрозділ'"></h2>
+
+    <form th:object="${department}" 
+          th:action="@{${department.id} == null ? '/departments' : '/departments/update/' + ${department.id}}" 
+          method="post">
+
+        <input type="hidden" th:field="*{id}"/>
+
+        <label for="name">Назва:</label>
+        <input type="text" id="name" th:field="*{name}" required/>
+
+        <label for="parent">Батьківський підрозділ:</label>
+        <select id="parent" th:field="*{parent}">
+            <option th:value="0" th:text="'--- Підрозділ не вибрано ---'"
+                    th:selected="${department.parent == null}"></option>
+            <option th:each="dept : ${allDepartments}" 
+                    th:value="${dept.id}" 
+                    th:selected="${department.parent != null} ? ${dept.id} == ${department.parent.id} : false"
+                    th:text="${'--'.repeat(dept.level) + dept.name}">
+            </option>
+        </select>
+
+        <div class="form-buttons">
+            <button type="submit" class="btn-add">Зберегти</button>
+            <a th:href="@{/departments}" class="btn-cancel">Скасувати</a>
+        </div>
+
+    </form>
+
+</div>
+</body>
+</html>

@@ -3,9 +3,12 @@ package ua.com.userdb.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import ua.com.userdb.dao.RankRepository;
 import ua.com.userdb.model.Rank;
 
+@Service
 public class RankServiceImpl implements RankService{
 	private RankRepository rankRepository;
 	

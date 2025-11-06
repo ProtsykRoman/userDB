@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title layout:fragment="title">Звання</title>
+    <link rel="stylesheet" th:href="@{/css/lists.css}">
+</head>
+<body>
+<div layout:fragment="content" class="list-container">
+
+    <h2>Список звань</h2>
+
+    <!-- Кнопка додавання нового рангу -->
+    <a class="btn-add" th:href="@{/ranks/new}">+ Створити нове звання</a>
+
+    <table class="list-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Назва</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="rank : ${ranks}">
+                <td th:text="${rank.id}"></td>
+                <td th:text="${rank.name}"></td>
+                <td class="table-actions">
+                    <a th:href="@{'/ranks/edit/' + ${rank.id}}" class="btn-edit">Редагувати</a>
+                    <a th:href="@{'/ranks/delete/' + ${rank.id}}" class="btn-delete"
+                       onclick="return confirm('Видалити це звання?');">Видалити</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

@@ -3,9 +3,12 @@ package ua.com.userdb.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import ua.com.userdb.dao.CertificateTypeRepository;
 import ua.com.userdb.model.CertificateType;
 
+@Service
 public class CertificateTypeServiceImpl implements CertificateTypeService{
 
 	private final CertificateTypeRepository certificateTypeRepository;

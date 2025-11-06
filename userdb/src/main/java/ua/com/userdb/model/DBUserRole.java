@@ -18,7 +18,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="db_users_roles", schema="userDB")
+@Table(name="db_users_roles", schema="userdb")
 public class DBUserRole {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

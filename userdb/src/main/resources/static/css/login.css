@@ -1,0 +1,90 @@
+/* Системні шрифти — чітко і без зовнішніх ресурсів */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #d7dbe2, #b0b8c4);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Центр */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+/* Основний блок */
+.login-box {
+    width: 360px;
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+.login-box h2 {
+    margin-bottom: 30px;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+/* Поля */
+.textbox {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.textbox input {
+    width: 100%;
+    padding: 12px 14px;
+    background: #f5f7fa;
+    border: 1px solid #cbd2d9;
+    border-radius: 6px;
+    outline: none;
+    font-size: 15px;
+    color: #333;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+.textbox input:focus {
+    border: 1px solid #4a6fa5;
+    box-shadow: 0 0 5px rgba(74, 111, 165, 0.3);
+}
+
+/* Кнопка */
+.btn {
+    width: 100%;
+    background: #4a6fa5;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.btn:hover {
+    background: #3a5c8e;
+    transform: translateY(-1px);
+}
+
+/* Повідомлення */
+.error-message {
+    color: #b00020;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.success-message {
+    color: #0a7a20;
+    margin-top: 15px;
+    font-size: 14px;
+}

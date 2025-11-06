@@ -1,74 +1,120 @@
 package ua.com.userdb.controller;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.*;
 import ua.com.userdb.model.User;
-import ua.com.userdb.service.DepartmenService;
+import ua.com.userdb.model.Department;
+import ua.com.userdb.model.Role;
 import ua.com.userdb.service.UserService;
+import ua.com.userdb.service.DepartmentService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/users")
 public class UserController {
-	private final UserService userService;
-    private final DepartmenService departmenService;
 
-    public UserController(UserService userService, DepartmenService departmenService) {
+    private final UserService userService;
+    private final DepartmentService departmentService;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserController(UserService userService, DepartmentService departmentService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
-        this.departmenService = departmenService;
+        this.departmentService = departmentService;
+        this.passwordEncoder = passwordEncoder;
     }
 
+    // ================= LIST =================
     @GetMapping
     public String listUsers(Model model) {
         List<User> users = userService.findAll();
         model.addAttribute("users", users);
-        return "users/list"; // -> templates/users/list.html
+        model.addAttribute("activePage", "users");
+        return "pages/users/list";
     }
 
+    // ================= NEW =================
     @GetMapping("/new")
-    public String showCreateForm(Model model) {
-        model.addAttribute("user", new User());
-        model.addAttribute("departments", departmenService.findAll());
-        return "users/create"; // -> templates/users/create.html
+    public String showNewForm(Model model) {
+        User user = new User();
+        model.addAttribute("user", user);
+        model.addAttribute("allDepartments", departmentService.getDepartmentsHierarchy());
+        model.addAttribute("roles", Role.values());
+        return "pages/users/form";
     }
 
-    @PostMapping
-    public String createUser(@ModelAttribute User user) {
-        if (user.getIsActive() == null) {
-            user.setIsActive(true);
+    // ================= EDIT =================
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable int id, Model model) {
+        Optional<User> userOpt = userService.findUserById(id);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            model.addAttribute("user", user);
+            model.addAttribute("allDepartments", departmentService.getDepartmentsHierarchy());
+            model.addAttribute("roles", Role.values());
+            return "pages/users/form";
         }
+        return "redirect:/users";
+    }
+
+    // ================= SAVE NEW =================
+    @PostMapping
+    public String saveUser(@ModelAttribute User user, Model model) {
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            model.addAttribute("error", "Пароль обов'язковий");
+            model.addAttribute("user", user);
+            model.addAttribute("departments", departmentService.findAll());
+            model.addAttribute("roles", Role.values());
+            return "pages/users/form";
+        }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.createUser(user);
         return "redirect:/users";
     }
 
-    @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Integer id, Model model) {
-        Optional<User> user = userService.findUserById(id);
-        if (user.isPresent()) {
-            model.addAttribute("user", user.get());
-            model.addAttribute("departments", departmenService.findAll());
-            return "users/edit"; // -> templates/users/edit.html
-        } else {
-            return "redirect:/users";
-        }
-    }
-
+    // ================= UPDATE EXISTING =================
     @PostMapping("/update/{id}")
-    public String updateUser(@PathVariable Integer id, @ModelAttribute User user) {
-        userService.updateUser(id, user);
+    public String updateUser(@PathVariable int id, @ModelAttribute User user, Model model) {
+
+        User existing = userService.findUserById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Користувач не знайдений"));
+
+        existing.setUsername(user.getUsername());
+        existing.setRole(user.getRole());
+        existing.setIsActive(user.getIsActive());
+        existing.setDepartment(user.getDepartment());
+
+        if (user.isChangePassword()) {
+            // Перевірка старого пароля
+            if (!passwordEncoder.matches(user.getOldPassword(), existing.getPassword())) {
+                model.addAttribute("error", "Старий пароль неправильний");
+                model.addAttribute("user", user);
+                model.addAttribute("departments", departmentService.findAll());
+                model.addAttribute("roles", Role.values());
+                return "pages/users/form";
+            }
+            // Перевірка нового пароля і підтвердження
+            if (!user.getNewPassword().equals(user.getConfirmPassword())) {
+                model.addAttribute("error", "Новий пароль і підтвердження не збігаються");
+                model.addAttribute("user", user);
+                model.addAttribute("departments", departmentService.findAll());
+                model.addAttribute("roles", Role.values());
+                return "pages/users/form";
+            }
+            existing.setPassword(passwordEncoder.encode(user.getNewPassword()));
+        }
+
+        userService.createUser(existing);
         return "redirect:/users";
     }
 
+    // ================= DELETE =================
     @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable Integer id) {
+    public String deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
         return "redirect:/users";
     }

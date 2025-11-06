@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title layout:fragment="title">Підрозділи</title>
+    <link rel="stylesheet" th:href="@{/css/lists.css}">
+</head>
+<body>
+<div layout:fragment="content" class="list-container">
+
+    <h2>Список підрозділів</h2>
+
+    <!-- Кнопка додавання нового відділу -->
+    <a class="btn-add" th:href="@{/departments/new}">+ Створити новий підрозділ</a>
+
+    <table class="list-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Назва</th>
+                <th>Батьківський підрозділ</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="dept : ${departments}">
+                <td th:text="${dept.id}"></td>
+                <td th:text="${dept.name}"></td>
+                <td th:text="${dept.parent != null ? dept.parent.name : '---'}"></td>
+                <td class="table-actions">
+                    <a th:href="@{'/departments/edit/' + ${dept.id}}" class="btn-edit">Редагувати</a>
+                    <a th:href="@{'/departments/delete/' + ${dept.id}}" class="btn-delete"
+                       onclick="return confirm('Ви впевнені?');">Видалити</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

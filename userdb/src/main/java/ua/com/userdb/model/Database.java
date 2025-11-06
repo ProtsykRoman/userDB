@@ -5,8 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,14 +16,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="databases", schema="userDB")
+@Table(name="databases", schema="userdb")
 public class Database {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	@Column(name="name", nullable = false)
 	private String name;
-	@ManyToOne
-	@JoinColumn(name="dababase_id", referencedColumnName = "id")
-	private Database database;
 }

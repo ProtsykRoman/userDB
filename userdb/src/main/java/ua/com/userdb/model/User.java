@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="users", schema="userDB")
+@Table(name="users", schema="userdb")
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,4 +35,12 @@ public class User {
 	@ManyToOne
 	@JoinColumn(name="department_id", referencedColumnName = "id")
 	private Department department;
+	@Transient
+    private boolean changePassword;
+    @Transient
+    private String oldPassword;
+    @Transient
+    private String newPassword;
+    @Transient
+    private String confirmPassword;
 }

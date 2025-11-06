@@ -1,0 +1,101 @@
+/* === Загальні налаштування === */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #d7dbe2, #b0b8c4);
+    color: #2c3e50;
+}
+
+/* === Контейнер сторінки === */
+.page-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* === Меню зліва === */
+.sidebar {
+    width: 200px;
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 15px;
+}
+
+.sidebar ul li a {
+    text-decoration: none;
+    color: #4a6fa5;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 5px;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+/* Hover ефект для пунктів меню */
+.sidebar ul li a:hover {
+    background-color: #3a5c8e;
+    color: #ffffff;
+}
+
+/* Активний пункт */
+.sidebar ul li a.active {
+    background-color: #4a6fa5;
+    color: #ffffff;
+}
+
+/* Hover для активного пункту */
+.sidebar ul li a.active:hover {
+    background-color: #3a5c8e;
+    color: #ffffff;
+}
+
+/* === Контент справа === */
+.content {
+    flex-grow: 1;
+    background: #f5f7fa;
+    padding: 30px;
+    box-sizing: border-box;
+    min-height: 100vh;
+}
+
+/* Заголовки контенту */
+.content h1, .content h2, .content h3 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+/* Параграфи */
+.content p {
+    line-height: 1.6;
+    color: #555;
+}
+
+/* Посилання у контенті */
+.content a {
+    color: #4a6fa5;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.content a:hover {
+    color: #3a5c8e;
+}

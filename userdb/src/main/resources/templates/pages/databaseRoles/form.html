@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title layout:fragment="title" th:text="${databaseRole.id == 0} ? 'Створити роль бази даних' : 'Редагувати роль бази даних'"></title>
+    <link rel="stylesheet" th:href="@{/css/forms.css}">
+</head>
+<body>
+<div layout:fragment="content" class="form-container">
+
+    <h2 th:text="${databaseRole.id == 0} ? 'Створити роль бази даних' : 'Редагувати роль бази даних'"></h2>
+
+    <div th:if="${error}" class="form-error">
+        <p th:text="${error}"></p>
+    </div>
+
+    <form th:object="${databaseRole}"
+          th:action="${databaseRole.id == 0} ? @{/database-roles} : @{'/database-roles/update/' + ${databaseRole.id}}"
+          method="post">
+
+        <input type="hidden" th:field="*{id}" />
+
+        <label for="name">Назва ролі:</label>
+        <input type="text" id="name" th:field="*{name}" required/>
+
+        <label for="database">База даних:</label>
+        <select id="database" th:field="*{database.id}" required>
+            <option th:value="0" th:text="'--- Виберіть базу даних ---'"
+                    th:selected="${databaseRole.database == null || databaseRole.database.id == 0}"></option>
+            <option th:each="db : ${databases}"
+                    th:value="${db.id}"
+                    th:text="${db.name}"
+                    th:selected="${databaseRole.database != null} ? ${db.id} == ${databaseRole.database.id} : false">
+            </option>
+        </select>
+
+        <div class="form-buttons">
+            <button type="submit" class="btn-add">Зберегти</button>
+            <a th:href="@{/database-roles}" class="btn-cancel">Скасувати</a>
+        </div>
+    </form>
+
+</div>
+</body>
+</html>

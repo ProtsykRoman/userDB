@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title layout:fragment="title">Типи сертифікатів</title>
+    <link rel="stylesheet" th:href="@{/css/lists.css}">
+</head>
+<body>
+<div layout:fragment="content" class="list-container">
+
+    <h2>Список типів сертифікатів</h2>
+
+    <!-- Кнопка для додавання нового сертифіката -->
+    <a class="btn-add" th:href="@{/certificate-types/new}">+ Додати новий сертифікат</a>
+
+    <!-- Таблиця -->
+    <table class="list-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Назва</th>
+            <th>Дії</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="certificateType : ${certificateTypes}">
+            <td th:text="${certificateType.id}"></td>
+            <td th:text="${certificateType.name}"></td>
+            <td class="table-actions">
+                <a th:href="@{'/certificate-types/edit/' + ${certificateType.id}}" class="btn-edit">Редагувати</a>
+                <a th:href="@{'/certificate-types/delete/' + ${certificateType.id}}"
+                   class="btn-delete"
+                   onclick="return confirm('Ви впевнені, що хочете видалити цей сертифікат?');">
+                    Видалити
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

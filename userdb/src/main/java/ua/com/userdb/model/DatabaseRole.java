@@ -18,7 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="databaseroles", schema="userDB")
+@Table(name="databaseroles", schema="userdb")
 public class DatabaseRole {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -26,7 +26,7 @@ public class DatabaseRole {
 	@Column(name="name", nullable = false)
 	private String name;
 	@ManyToOne
-	@JoinColumn(name="dababase_id", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name="database_id", referencedColumnName = "id", nullable = false)
 	private Database database;
 
 }

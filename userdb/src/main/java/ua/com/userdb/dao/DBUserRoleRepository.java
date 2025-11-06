@@ -9,6 +9,6 @@ import ua.com.userdb.model.DBUserRole;
 import ua.com.userdb.model.DatabaseRole;
 
 public interface DBUserRoleRepository extends JpaRepository<DBUserRole, Integer> {
-	List<DBUserRole> findDBUserRoleByDatabeseRole(DatabaseRole databaseRole);
-	List<DBUserRole> findDBUserRoleByDBUser(DBUser dbUser);
+	List<DBUserRole> findDBUserRoleByDatabaseRole(DatabaseRole databaseRole);
+	List<DBUserRole> findDBUserRoleBydbUser(DBUser dbUser);
 }

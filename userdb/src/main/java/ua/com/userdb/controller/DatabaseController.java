@@ -1,15 +1,10 @@
 package ua.com.userdb.controller;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import ua.com.userdb.model.Database;
 import ua.com.userdb.service.DatabaseService;
@@ -17,37 +12,38 @@ import ua.com.userdb.service.DatabaseService;
 @Controller
 @RequestMapping("/databases")
 public class DatabaseController {
-	private final DatabaseService databaseService;
+    private final DatabaseService databaseService;
 
     public DatabaseController(DatabaseService databaseService) {
         this.databaseService = databaseService;
     }
 
     @GetMapping
-    public String listDatabases(Model model) {
-        List<Database> databases = databaseService.findAllDatabase();
-        model.addAttribute("databases", databases);
-        return "databases/list"; // -> templates/databases/list.html
+    public String databases(Model model) {
+        model.addAttribute("databases", databaseService.findAllDatabase());
+        model.addAttribute("activePage", "databases");
+        return "pages/databases/list";
     }
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("database", new Database());
-        return "databases/create"; // -> templates/databases/create.html
+        return "pages/databases/form";
     }
 
     @PostMapping
     public String createDatabase(@ModelAttribute Database database) {
         databaseService.createDatabase(database);
+        System.out.println(database);
         return "redirect:/databases";
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Integer id, Model model) {
-        Optional<Database> database = databaseService.findDatabaseById(id);
-        if (database.isPresent()) {
-            model.addAttribute("database", database.get());
-            return "databases/edit"; // -> templates/databases/edit.html
+        Optional<Database> db = databaseService.findDatabaseById(id);
+        if (db.isPresent()) {
+            model.addAttribute("database", db.get());
+            return "pages/databases/form";
         } else {
             return "redirect:/databases";
         }

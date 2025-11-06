@@ -3,14 +3,20 @@ package ua.com.userdb.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import ua.com.userdb.dao.UserRepository;
 import ua.com.userdb.model.User;
 
+@Service
 public class UserServiceImpl implements UserService{
 	private UserRepository userRepository;
+	private PasswordEncoder passwordEncoder;
 	
-	public UserServiceImpl(UserRepository userRepository) {
+	public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 	
 	@Override
@@ -30,6 +36,9 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public User createUser(User user) {
+		if (user.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
 		return userRepository.save(user);
 	}
 

@@ -8,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -23,7 +22,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name="db_users_certificates")
+@Table(name="db_users_certificates", schema="userdb")
 public class DBUserCertificate {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

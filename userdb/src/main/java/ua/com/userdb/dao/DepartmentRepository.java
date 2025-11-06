@@ -9,5 +9,5 @@ import ua.com.userdb.model.Department;
 
 public interface DepartmentRepository extends JpaRepository<Department, Integer>{
 	Optional<Department> findByName(String name);
-	List<Department> findAllChildrenDepartments(Department department);
+	List<Department> findByParent(Department department);
 }

@@ -1,5 +1,9 @@
 package ua.com.userdb.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,13 +23,13 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name="DBUsers", schema="userDB")
+@Table(name="dbusers", schema="userdb")
 public class DBUser {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	@Column(name = "name", nullable = false)
-	private String Name;
+	private String name;
 	@ManyToOne
 	@JoinColumn(name = "rank_id", referencedColumnName = "id")
 	private Rank rank;
@@ -33,4 +38,10 @@ public class DBUser {
 	private Department department;
 	@Column(name = "identificationNumber")
 	private int identificationNumber;
+	@OneToMany(mappedBy = "dbUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DBUserAccess> dbUserAccesses = new ArrayList<>();
+    @OneToMany(mappedBy = "dbUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DBUserCertificate> dbUserCertificates = new ArrayList<>();
+    @OneToMany(mappedBy = "dbUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DBUserRole> dbUserRoles = new ArrayList<>();
 }

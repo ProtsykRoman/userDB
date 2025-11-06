@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<title layout:fragment="title"
+	th:text="${dbUser.id == null} ? 'Створити користувача бази даних' : 'Редагувати користувача бази даних'">
+</title>
+<link rel="stylesheet" th:href="@{/css/forms.css}">
+</head>
+<body>
+	<div layout:fragment="content" class="form-container">
+
+		<h2
+			th:text="${dbUser.id == null} ? 'Створити користувача бази даних' : 'Редагувати користувача бази даних'"></h2>
+
+		<div th:if="${error}" class="form-error">
+			<p th:text="${error}"></p>
+		</div>
+
+		<form th:object="${dbUser}"
+			th:action="${dbUser.id == null} ? @{/dbusers} : @{/dbusers/update/{id}(id=${dbUser.id})}"
+			method="post">
+
+			<input type="hidden" th:field="*{id}" />
+
+			<!-- Ім’я -->
+			<label for="name">Ім’я:</label> <input type="text" id="name"
+				th:field="*{name}" required />
+
+			<!-- Ранг -->
+			<label for="rank">Ранг:</label> <select id="rank"
+				th:field="*{rank.id}">
+				<option value="">-- Виберіть ранг --</option>
+				<option th:each="r : ${ranks}" th:value="${r.id}"
+					th:text="${r.name}"
+					th:selected="${dbUser.rank != null} ? ${r.id} == ${dbUser.rank.id} : false">
+				</option>
+			</select>
+
+			<!-- Департамент -->
+			<label for="department">Департамент:</label> <select id="department"
+				th:field="*{department.id}" required>
+				<option th:value="0" th:text="'--- Виберіть департамент ---'"
+					th:selected="${dbUser.department == null || dbUser.department.id == 0}">
+				</option>
+				<option th:each="dept : ${allDepartments}" th:value="${dept.id}"
+					th:selected="${dbUser.department != null} ? ${dept.id} == ${dbUser.department.id} : false"
+					th:text="${'--'.repeat(dept.level) + dept.name}"></option>
+			</select>
+
+			<!-- Ідентифікаційний номер -->
+			<label for="identificationNumber">Identification Number:</label> <input
+				type="number" id="identificationNumber"
+				th:field="*{identificationNumber}" />
+
+			<div class="form-buttons">
+				<button type="submit" class="btn-add">Зберегти</button>
+				<a th:href="@{/dbusers}" class="btn-cancel">Скасувати</a>
+			</div>
+
+			<!-- Таблиця доступів -->
+			<h3>Доступи до баз даних</h3>
+
+			<table id="accessTable" class="data-table">
+				<thead>
+					<tr>
+						<th>База даних</th>
+						<th>Дата завершення доступу</th>
+						<th>Дія</th>
+					</tr>
+				</thead>
+				<tbody id="accessBody">
+					<tr th:each="access, iStat : *{dbUserAccesses}">
+						<td><select
+							th:field="*{dbUserAccesses[__${iStat.index}__].database.id}"
+							required>
+								<option value="">-- Виберіть базу даних --</option>
+								<option th:each="db : ${databases}" th:value="${db.id}"
+									th:text="${db.name}"
+									th:selected="${access.database != null} ? ${db.id} == ${access.database.id} : false">
+								</option>
+						</select></td>
+						<td><input type="date"
+							th:field="*{dbUserAccesses[__${iStat.index}__].accessExpirationDate}" />
+						</td>
+						<td>
+							<button type="button" class="btn-delete"
+								onclick="removeAccessRow(this)">Видалити</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<button type="button" class="btn-add" id="addAccessBtn">Додати
+				доступ</button>
+
+
+		</form>
+	</div>
+</body>
+</html>

@@ -1,6 +1,5 @@
 package ua.com.userdb.controller;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
@@ -24,16 +23,16 @@ public class CertificateTypeController {
 	}
 	
     @GetMapping
-    public String listCertificateTypes(Model model) {
-        List<CertificateType> certificateTypes = certificateTypeService.findAllCertificateType();
-        model.addAttribute("certificateTypes", certificateTypes);
-        return "certificate-types/list";  // -> templates/certificate-types/list.html
+    public String certificateTypes(Model model) {
+    	model.addAttribute("certificateTypes", certificateTypeService.findAllCertificateType());
+    	model.addAttribute("activePage", "certificate-types");
+        return "pages/certificateTypes/list";
     }
-
+	
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("certificateType", new CertificateType());
-        return "certificate-types/create"; // -> templates/certificate-types/create.html
+        return "pages/certificateTypes/form";
     }
 
     @PostMapping
@@ -47,7 +46,7 @@ public class CertificateTypeController {
         Optional<CertificateType> certificateType = certificateTypeService.findCertificateTypeById(id);
         if (certificateType.isPresent()) {
             model.addAttribute("certificateType", certificateType.get());
-            return "certificate-types/edit"; // -> templates/certificate-types/edit.html
+            return "pages/certificateTypes/form"; // -> templates/certificate-types/edit.html
         } else {
             return "redirect:/certificate-types";
         }

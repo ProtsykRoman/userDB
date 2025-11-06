@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title layout:fragment="title">Список користувачів баз данних</title>
+    <link rel="stylesheet" th:href="@{/css/lists.css}">
+</head>
+<body>
+<div layout:fragment="content" class="list-container">
+
+    <h2>Список користувачів баз данних</h2>
+
+    <a class="btn-add" th:href="@{/dbusers/new}">+ Додати нового користувача</a>
+
+    <table class="list-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ім'я</th>
+                <th>Звання</th>
+                <th>Підрозділ</th>
+                <th>Ідентифікаційний номер</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="user : ${dbUsers}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.name}"></td>
+                <td th:text="${user.rank?.name}"></td>
+                <!-- Ієрархічний департамент -->
+                <td th:text="${user.department != null ? '--'.repeat(user.department.level) + user.department.name : ''}"></td>
+                <td th:text="${user.identificationNumber}"></td>
+                <td class="table-actions">
+                    <a th:href="@{/dbusers/edit/{id}(id=${user.id})}" class="btn-edit">Редагувати</a>
+                    <a th:href="@{/dbusers/delete/{id}(id=${user.id})}" class="btn-delete"
+                       onclick="return confirm('Ви впевнені?');">Видалити</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

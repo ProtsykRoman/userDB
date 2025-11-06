@@ -1,0 +1,12 @@
+<div th:fragment="missingContent">
+    <div style="padding: 20px; border: 1px solid #f00; background-color: #fee; color: #c00;">
+        <h2>🛑 Помилка відображення контенту</h2>
+        <p>Система не змогла завантажити основний вміст сторінки. Змінна <code>contentFragment</code> не була визначена контролером.</p>
+        <p><strong>Ймовірні причини:</strong></p>
+        <ul>
+            <li>Викликано URL, для якого немає <code>@GetMapping</code> у контролері.</li>
+            <li>Відбулася внутрішня помилка (4xx/5xx), що викликала <code>layout</code> без моделі.</li>
+        </ul>
+        <p>Будь ласка, перевірте URL або зверніться до розробника.</p>
+    </div>
+</div>

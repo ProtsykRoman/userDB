@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<title layout:fragment="title"
+	th:text="${user.id == 0} ? 'Створити користувача' : 'Редагувати користувача'"></title>
+<link rel="stylesheet" th:href="@{/css/forms.css}">
+<script>
+        function togglePasswordFields() {
+            const checkbox = document.getElementById('changePassword');
+            const passwordFields = document.getElementById('passwordFields');
+            if(passwordFields) {
+                passwordFields.style.display = checkbox.checked ? 'block' : 'none';
+            }
+        }
+
+        function validateForm(event) {
+            let password, confirmPassword;
+            const userId = parseInt(document.getElementById('id').value);
+
+            if(userId === 0) { 
+                password = document.getElementById('password').value;
+                confirmPassword = document.getElementById('confirmPassword').value;
+            } else { 
+                const changePassword = document.getElementById('changePassword').checked;
+                if(changePassword) {
+                    password = document.getElementById('newPassword').value;
+                    confirmPassword = document.getElementById('confirmPassword').value;
+                } else {
+                    return true;
+                }
+            }
+
+            if(password !== confirmPassword) {
+                alert("Паролі не збігаються!");
+                event.preventDefault();
+                return false;
+            }
+
+            return true;
+        }
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            togglePasswordFields();
+            const checkbox = document.getElementById('changePassword');
+            if(checkbox) checkbox.addEventListener('change', togglePasswordFields);
+
+            const form = document.querySelector('form');
+            if(form) form.addEventListener('submit', validateForm);
+        });
+    </script>
+</head>
+<body>
+	<div layout:fragment="content" class="form-container">
+
+		<h2
+			th:text="${user.id == 0} ? 'Створити користувача' : 'Редагувати користувача'"></h2>
+
+		<div th:if="${error}" class="form-error">
+			<p th:text="${error}"></p>
+		</div>
+
+		<form th:object="${user}"
+			th:action="${user.id == 0} ? @{/users} : @{'/users/update/' + ${user.id}}"
+			method="post">
+
+			<input type="hidden" id="id" th:field="*{id}" /> <label
+				for="username">Логін:</label> <input type="text" id="username"
+				th:field="*{username}" required />
+
+			<div th:if="${user.id == 0}">
+				<label for="password">Пароль:</label> <input type="password"
+					id="password" th:field="*{password}" required /> <label
+					for="confirmPassword">Підтвердження пароля:</label> <input
+					type="password" id="confirmPassword" th:field="*{confirmPassword}"
+					required />
+			</div>
+
+			<div th:if="${user.id != 0}">
+				<input type="checkbox" id="changePassword"
+					th:field="*{changePassword}" /> <label for="changePassword">Змінити
+					пароль</label>
+
+				<div id="passwordFields" style="display: none;">
+					<label for="oldPassword">Старий пароль:</label> <input
+						type="password" id="oldPassword" th:field="*{oldPassword}" /> <label
+						for="newPassword">Новий пароль:</label> <input type="password"
+						id="newPassword" th:field="*{newPassword}" /> <label
+						for="confirmPassword">Підтвердження нового пароля:</label> <input
+						type="password" id="confirmPassword" th:field="*{confirmPassword}" />
+				</div>
+			</div>
+
+			<label for="department">Департамент:</label> <select id="department"
+				th:field="*{department.id}">
+				<option th:value="0" th:text="'--- Виберіть департамент ---'"
+					th:selected="${user.department == null || user.department.id == 0}"></option>
+				<option th:each="dept : ${allDepartments}" th:value="${dept.id}"
+					th:selected="${user.department != null} ? ${dept.id} == ${user.department.id} : false"
+					th:text="${'--'.repeat(dept.level) + dept.name}"></option>
+			</select>
+
+
+
+			<div class="form-buttons">
+				<button type="submit" class="btn-add">Зберегти</button>
+				<a th:href="@{/users}" class="btn-cancel">Скасувати</a>
+			</div>
+
+		</form>
+
+	</div>
+</body>
+</html>

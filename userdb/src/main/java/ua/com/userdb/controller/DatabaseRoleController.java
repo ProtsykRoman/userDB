@@ -1,68 +1,93 @@
 package ua.com.userdb.controller;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import ua.com.userdb.model.Database;
+import ua.com.userdb.model.DatabaseRole;
+import ua.com.userdb.service.DatabaseRoleService;
+import ua.com.userdb.service.DatabaseService;
+
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import ua.com.userdb.model.DatabaseRole;
-import ua.com.userdb.service.DatabaseRoleService;
-
 @Controller
-@RequestMapping("database-roles")
+@RequestMapping("/database-roles")
 public class DatabaseRoleController {
-	private DatabaseRoleService databaseRoleService;
-	
-	public DatabaseRoleController(DatabaseRoleService databaseRoleService) {
-		this.databaseRoleService = databaseRoleService;
-	}
-	
-	@GetMapping
-	public String listDatabaseRoles(Model model) {
-		List<DatabaseRole> databaseRoles = databaseRoleService.findAllDatabaseRole();
-		model.addAttribute("databaseRoles", databaseRoles);
-		return "database-roles/list"; // -> templates/database-roles/list.html
-	}
-	
-	@GetMapping("/new")
-	public String showCreateForm(Model model) {
-		model.addAttribute("databaseRole", new DatabaseRole());
-		return "database-roles/create"; // -> templates/database-roles/create.html
-	}
-	
-	@PostMapping
-	public String createDatabaseRole(@ModelAttribute DatabaseRole databaseRole) {
-		databaseRoleService.createDatabaseRole(databaseRole);
-		return "redirect:database-roles";
-	}
-	
-	@GetMapping("/edit/{id}")
-	public String showEditForm(@PathVariable Integer id, Model model) {
-		Optional<DatabaseRole> databaseRole = databaseRoleService.findDatabaseRoleById(id);
-		if (databaseRole.isPresent()) {
-			model.addAttribute("databaseRole", databaseRole.get());
-			return "database-role/edit"; // -> templates/database-role/edit.html
-		} else {
-            return "redirect:/database-roles";
+
+    private final DatabaseRoleService databaseRoleService;
+    private final DatabaseService databaseService;
+
+    public DatabaseRoleController(DatabaseRoleService databaseRoleService, DatabaseService databaseService) {
+        this.databaseRoleService = databaseRoleService;
+        this.databaseService = databaseService;
+    }
+
+    @GetMapping
+    public String listDatabaseRoles(Model model) {
+        model.addAttribute("databaseRoles", databaseRoleService.findAllDatabaseRole());
+        model.addAttribute("activePage", "database-roles");
+        return "pages/databaseRoles/list";
+    }
+
+    @GetMapping("/new")
+    public String showForm(Model model) {
+        DatabaseRole databaseRole = new DatabaseRole();
+        databaseRole.setDatabase(new Database()); // для binding
+        model.addAttribute("databaseRole", databaseRole);
+        model.addAttribute("databases", databaseService.findAllDatabase());
+        return "pages/databaseRoles/form";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String showForm(@PathVariable Integer id, Model model) {
+        Optional<DatabaseRole> databaseRoleOpt = databaseRoleService.findDatabaseRoleById(id);
+        if (databaseRoleOpt.isPresent()) {
+            model.addAttribute("databaseRole", databaseRoleOpt.get());
+            model.addAttribute("databases", databaseService.findAllDatabase());
+            return "pages/databaseRoles/form";
         }
-	}
-	
-	@PostMapping("/update/{id}")
-	public String updateDatabaseRole(@PathVariable Integer id,
-			@ModelAttribute DatabaseRole databaseRole) {
-		databaseRoleService.updateDatabaseRole(id, databaseRole);
-		return "redirect:/database-roles";
-	}
-	
-	@GetMapping("/delete/{id}")
-	public String deleteCertificateType(@PathVariable Integer id) {
-		databaseRoleService.deleteDatabaseRole(id);
         return "redirect:/database-roles";
-    } 
+    }
+
+    @PostMapping
+    public String saveDatabaseRole(@ModelAttribute DatabaseRole databaseRole, Model model) {
+        if (databaseRole.getDatabase() == null || databaseRole.getDatabase().getId() == 0) {
+            model.addAttribute("error", "Будь ласка, виберіть базу даних");
+            model.addAttribute("databases", databaseService.findAllDatabase());
+            return "pages/databaseRoles/form";
+        }
+
+        Database db = databaseService.findDatabaseById(databaseRole.getDatabase().getId())
+                .orElseThrow(() -> new IllegalArgumentException("База даних не знайдена"));
+        databaseRole.setDatabase(db);
+        databaseRoleService.createDatabaseRole(databaseRole);
+        return "redirect:/database-roles";
+    }
+
+    @PostMapping("/update/{id}")
+    public String updateDatabaseRole(@PathVariable Integer id,
+                                     @ModelAttribute DatabaseRole databaseRole,
+                                     Model model) {
+        if (databaseRole.getDatabase() == null || databaseRole.getDatabase().getId() == 0) {
+            model.addAttribute("error", "Будь ласка, виберіть базу даних");
+            model.addAttribute("databases", databaseService.findAllDatabase());
+            return "pages/databaseRoles/form";
+        }
+
+        Database db = databaseService.findDatabaseById(databaseRole.getDatabase().getId())
+                .orElseThrow(() -> new IllegalArgumentException("База даних не знайдена"));
+        databaseRole.setDatabase(db);
+
+        // Викликаємо сервіс, який оновлює об’єкт за id
+        databaseRoleService.updateDatabaseRole(id, databaseRole);
+        return "redirect:/database-roles";
+    }
+
+
+    @GetMapping("/delete/{id}")
+    public String deleteDatabaseRole(@PathVariable Integer id) {
+        databaseRoleService.deleteDatabaseRole(id);
+        return "redirect:/database-roles";
+    }
 }

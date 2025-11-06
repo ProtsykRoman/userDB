@@ -10,7 +10,7 @@ import ua.com.userdb.model.DBUserAccess;
 import ua.com.userdb.model.Database;
 
 public interface DBUserAccessRepository extends JpaRepository<DBUserAccess, Integer>{
-	List<DBUserAccess> findAllByExpirationDate(Date date);
+	List<DBUserAccess> findAllByAccessExpirationDate(Date date);
 	List<DBUserAccess> findAllByDatabase(Database database);
-	List<DBUserAccess> findAllByDBUser(DBUser dbUser);
+	List<DBUserAccess> findAllBydbUser(DBUser dbUser);
 }

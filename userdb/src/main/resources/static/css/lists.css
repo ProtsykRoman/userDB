@@ -1,0 +1,98 @@
+/* === Контейнер списку === */
+.list-container {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    padding: 25px 30px;
+    margin-top: 30px;
+}
+
+/* === Заголовок сторінки === */
+.list-container h2 {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-weight: 500;
+}
+
+.btn-add {
+    display: inline-block;
+    background-color: #4a6fa5; /* той самий синій, що у th */
+    color: #ffffff !important;  /* обов’язково білий текст */
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    margin-bottom: 20px;
+}
+
+.btn-add:hover {
+    background-color: #3a5c8e;
+    color: #ffffff !important;  /* і при наведенні теж */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+
+/* === Таблиця === */
+.list-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    background: #f9fafc;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.list-table th {
+    background-color: #4a6fa5;
+    color: #ffffff;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 500;
+}
+
+.list-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e0e4eb;
+    color: #2c3e50;
+}
+
+.list-table tr:hover {
+    background-color: #eef3fb;
+    transition: background 0.3s ease;
+}
+
+/* === Дії у списку === */
+.table-actions a {
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    margin-right: 8px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Кнопка "Редагувати" */
+.table-actions .btn-edit {
+    background-color: #3b7ddd; /* яскравий синій */
+}
+
+.table-actions .btn-edit:hover {
+    background-color: #2f68ba;
+    color: #ffffff;
+}
+
+/* Кнопка "Видалити" */
+.table-actions .btn-delete {
+    background-color: #e53935; /* яскраво-червоний */
+}
+
+.table-actions .btn-delete:hover {
+    background-color: #c62828; /* темніший червоний */
+    color: #ffffff;
+}

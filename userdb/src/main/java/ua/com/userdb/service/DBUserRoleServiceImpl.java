@@ -3,11 +3,14 @@ package ua.com.userdb.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import ua.com.userdb.dao.DBUserRoleRepository;
 import ua.com.userdb.model.DBUser;
 import ua.com.userdb.model.DBUserRole;
 import ua.com.userdb.model.DatabaseRole;
 
+@Service
 public class DBUserRoleServiceImpl implements DBUserRoleService {
 	private DBUserRoleRepository dbUserRoleRepository;
 	
@@ -27,12 +30,12 @@ public class DBUserRoleServiceImpl implements DBUserRoleService {
 
 	@Override
 	public List<DBUserRole> findDBUserRoleByDatabeseRole(DatabaseRole databaseRole) {
-		return dbUserRoleRepository.findDBUserRoleByDatabeseRole(databaseRole);
+		return dbUserRoleRepository.findDBUserRoleByDatabaseRole(databaseRole);
 	}
 
 	@Override
 	public List<DBUserRole> findDBUserRoleByDBUser(DBUser dbUser) {
-		return dbUserRoleRepository.findDBUserRoleByDBUser(dbUser);
+		return dbUserRoleRepository.findDBUserRoleBydbUser(dbUser);
 	}
 
 	@Override

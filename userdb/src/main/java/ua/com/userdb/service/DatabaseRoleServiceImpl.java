@@ -3,10 +3,13 @@ package ua.com.userdb.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import ua.com.userdb.dao.DatabaseRoleRepository;
 import ua.com.userdb.model.Database;
 import ua.com.userdb.model.DatabaseRole;
 
+@Service
 public class DatabaseRoleServiceImpl implements DatabaseRoleService {
 	private DatabaseRoleRepository databaseRoleRepository;
 	

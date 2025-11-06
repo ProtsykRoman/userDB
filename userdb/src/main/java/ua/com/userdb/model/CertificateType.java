@@ -16,7 +16,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "certificate_types", schema = "userDB")
+@Table(name = "certificate_types", schema="userdb")
 public class CertificateType {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

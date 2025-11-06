@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title layout:fragment="title">My App</title>
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+</head>
+<body>
+<div class="page-container">
+
+    <!-- Меню зліва -->
+    <div class="sidebar">
+        <ul>
+            <li><a th:href="@{/home}" th:classappend="${activePage == 'home'} ? ' active'">Головна</a></li>
+            <li><a th:href="@{/dbusers}" th:classappend="${activePage == 'dbusers'} ? ' active'">Користувачі баз даних</a></li>
+            <li><a th:href="@{/databases}" th:classappend="${activePage == 'databases'} ? ' active'">Бази даних</a></li>
+            <li><a th:href="@{/database-roles}" th:classappend="${activePage == 'database-roles'} ? ' active'">Ролі баз даних</a></li>
+            <li><a th:href="@{/certificate-types}" th:classappend="${activePage == 'certificate-types'} ? ' active'">Типи сертифікатів</a></li>
+            <li><a th:href="@{/departments}" th:classappend="${activePage == 'departments'} ? ' active'">Підрозділи</a></li>
+            <li><a th:href="@{/ranks}" th:classappend="${activePage == 'ranks'} ? ' active'">Звання</a></li>
+            <li><a th:href="@{/users}" th:classappend="${activePage == 'users'} ? ' active'">Користувачі ІС</a></li>
+        </ul>
+    </div>
+
+    <!-- Контент справа -->
+    <div class="content">
+        <div layout:fragment="content"></div>
+    </div>
+
+</div>
+</body>
+</html>

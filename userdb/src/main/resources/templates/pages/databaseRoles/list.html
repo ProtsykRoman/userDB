@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title layout:fragment="title">Ролі баз даних</title>
+    <link rel="stylesheet" th:href="@{/css/lists.css}">
+</head>
+<body>
+<div layout:fragment="content" class="list-container">
+
+    <h2>Список ролей баз даних</h2>
+
+    <!-- Кнопка створення нової ролі -->
+    <a class="btn-add" th:href="@{/database-roles/new}">+ Створити нову роль</a>
+
+    <!-- Таблиця -->
+    <table class="list-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Назва</th>
+            <th>База даних</th>
+            <th>Дії</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="role : ${databaseRoles}">
+            <td th:text="${role.id}"></td>
+            <td th:text="${role.name}"></td>
+            <td th:text="${role.database != null ? role.database.name : '—'}"></td>
+            <td class="table-actions">
+                <a th:href="@{'/database-roles/edit/' + ${role.id}}" class="btn-edit">Редагувати</a>
+                <a th:href="@{'/database-roles/delete/' + ${role.id}}"
+                   class="btn-delete"
+                   onclick="return confirm('Видалити цю роль?')">Видалити</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

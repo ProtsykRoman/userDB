@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,16 +24,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="departments", schema="userDB")
+@Table(name="departments", schema="userdb")
 public class Department {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
-	@Column(name="name")
+	private Integer id;
+	@Column(name="name", nullable = false)
 	private String name;
 	@ManyToOne
     @JoinColumn(name = "parent_id")
     private Department parent;
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Department> children = new ArrayList<>();
+    @Transient
+    private int level;
 }

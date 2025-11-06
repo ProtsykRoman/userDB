@@ -4,11 +4,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import ua.com.userdb.dao.DBUserAccessRepository;
 import ua.com.userdb.model.DBUser;
 import ua.com.userdb.model.DBUserAccess;
 import ua.com.userdb.model.Database;
 
+@Service
 public class DBUserAccessServiceImpl implements DBUserAccessService{
 	
 	private DBUserAccessRepository dbUserAccessRepository;
@@ -29,7 +32,7 @@ public class DBUserAccessServiceImpl implements DBUserAccessService{
 
 	@Override
 	public List<DBUserAccess> findDBUserAccessByAccessExpirationDate(Date date) {
-		return dbUserAccessRepository.findAllByExpirationDate(date);
+		return dbUserAccessRepository.findAllByAccessExpirationDate(date);
 	}
 
 	@Override
@@ -39,7 +42,7 @@ public class DBUserAccessServiceImpl implements DBUserAccessService{
 
 	@Override
 	public List<DBUserAccess> findDBUserAccessByDBUser(DBUser dbUser) {
-		return dbUserAccessRepository.findAllByDBUser(dbUser);
+		return dbUserAccessRepository.findAllBydbUser(dbUser);
 	}
 
 	@Override

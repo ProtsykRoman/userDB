@@ -4,11 +4,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import ua.com.userdb.dao.DBUserCertificateRepository;
 import ua.com.userdb.model.CertificateType;
 import ua.com.userdb.model.DBUser;
 import ua.com.userdb.model.DBUserCertificate;
 
+@Service
 public class DBUserCertificateServiceImpl implements DBUserCertificateService{
 	private DBUserCertificateRepository dbUserCertificateRepository;
 	
@@ -28,7 +31,7 @@ public class DBUserCertificateServiceImpl implements DBUserCertificateService{
 
 	@Override
 	public List<DBUserCertificate> findDBUserCertificateByDBUser(DBUser dbUser) {
-		return dbUserCertificateRepository.findDBUserCertificateByDBUser(dbUser);
+		return dbUserCertificateRepository.findDBUserCertificateBydbUser(dbUser);
 	}
 
 	@Override
@@ -38,7 +41,7 @@ public class DBUserCertificateServiceImpl implements DBUserCertificateService{
 
 	@Override
 	public List<DBUserCertificate> findDBUserCertificatesExpiringBefore(Date date) {
-		return dbUserCertificateRepository.findDBUserCertificatesExpiringBefore(date);
+		return dbUserCertificateRepository.findByExpirationDateBefore(date);
 	}
 
 	@Override

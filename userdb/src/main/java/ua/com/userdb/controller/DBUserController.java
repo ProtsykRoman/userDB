@@ -1,39 +1,48 @@
 package ua.com.userdb.controller;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import ua.com.userdb.model.DBUser;
-import ua.com.userdb.service.DBUserService;
+import ua.com.userdb.service.*;
 
 @Controller
 @RequestMapping("/dbusers")
 public class DBUserController {
-	private final DBUserService dbUserService;
 
-    public DBUserController(DBUserService dbUserService) {
+    private final DBUserService dbUserService;
+    private final RankService rankService;
+    private final DepartmentService departmentService;
+    private final DatabaseService databaseService;
+
+    public DBUserController(DBUserService dbUserService, 
+    						RankService rankService, 
+    						DepartmentService departmentService, 
+    						DatabaseService databaseService) {
         this.dbUserService = dbUserService;
+        this.rankService = rankService;
+        this.departmentService = departmentService;
+        this.databaseService = databaseService;
     }
 
     @GetMapping
     public String listDBUsers(Model model) {
-        List<DBUser> dbUsers = dbUserService.findAll();
-        model.addAttribute("dbUsers", dbUsers);
-        return "dbusers/list"; // -> templates/dbusers/list.html
+        model.addAttribute("dbUsers", dbUserService.findAll());
+        model.addAttribute("activePage", "dbUsers");
+        return "pages/dbuser/list";
     }
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("dbUser", new DBUser());
-        return "dbusers/create"; // -> templates/dbusers/create.html
+        DBUser dbUser = new DBUser();
+        model.addAttribute("dbUser", dbUser);
+        model.addAttribute("ranks", rankService.findAll());
+        model.addAttribute("allDepartments", departmentService.getDepartmentsHierarchy());
+        model.addAttribute("databases", databaseService.findAllDatabase());
+        return "pages/dbuser/form";
     }
 
     @PostMapping
@@ -44,10 +53,15 @@ public class DBUserController {
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Integer id, Model model) {
-        Optional<DBUser> dbUser = dbUserService.findById(id);
-        if (dbUser.isPresent()) {
-            model.addAttribute("dbUser", dbUser.get());
-            return "dbusers/edit"; // -> templates/dbusers/edit.html
+        Optional<DBUser> dbUserOpt = dbUserService.findById(id);
+        if (dbUserOpt.isPresent()) {
+            DBUser dbUser = dbUserOpt.get();
+            model.addAttribute("dbUser", dbUser);
+            model.addAttribute("ranks", rankService.findAll());
+            model.addAttribute("allDepartments", departmentService.getDepartmentsHierarchy());
+            model.addAttribute("databases", databaseService.findAllDatabase());
+
+            return "pages/dbuser/form";
         } else {
             return "redirect:/dbusers";
         }
@@ -64,4 +78,5 @@ public class DBUserController {
         dbUserService.deleteDBUser(id);
         return "redirect:/dbusers";
     }
+
 }
