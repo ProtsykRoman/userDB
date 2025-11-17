@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
     addRoleBtn?.addEventListener('click', () => {
         const index = roleBody.querySelectorAll('tr').length;
         const tr = document.createElement('tr');
-        const options = databaseRoles.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+        const options = databaseRoles.map(r => `<option value="${r.id}">${r.name} (${r.database.name})</option>`).join('');
 
         tr.innerHTML = `
             <td>

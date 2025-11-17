@@ -32,10 +32,9 @@
                 <!-- Ієрархічний департамент -->
                 <td th:text="${user.department != null ? '--'.repeat(user.department.level) + user.department.name : ''}"></td>
                 <td th:text="${user.identificationNumber}"></td>
+                <td th:text="${certificateType.isActive} ? 'Так' : 'Ні'"></td>
                 <td class="table-actions">
                     <a th:href="@{/dbusers/edit/{id}(id=${user.id})}" class="btn-edit">Редагувати</a>
-                    <a th:href="@{/dbusers/delete/{id}(id=${user.id})}" class="btn-delete"
-                       onclick="return confirm('Ви впевнені?');">Видалити</a>
                 </td>
             </tr>
         </tbody>

@@ -36,6 +36,8 @@ public class Department {
     private Department parent;
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Department> children = new ArrayList<>();
+    @Column(name = "is_active")
+	private Boolean isActive = true;
     @Transient
     private int level;
 }

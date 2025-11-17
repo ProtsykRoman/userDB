@@ -38,6 +38,8 @@ public class DBUser {
 	private Department department;
 	@Column(name = "identificationNumber")
 	private int identificationNumber;
+	@Column(name = "is_active")
+	private Boolean isActive = true;
 	@OneToMany(mappedBy = "dbUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DBUserAccess> dbUserAccesses = new ArrayList<>();
     @OneToMany(mappedBy = "dbUser", cascade = CascadeType.ALL, orphanRemoval = true)

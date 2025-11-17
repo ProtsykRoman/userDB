@@ -59,6 +59,9 @@
                             th:text="${'--'.repeat(dept.level) + dept.name}"></option>
                 </select>
             </div>
+            <label> <input
+					type="checkbox" th:field="*{isActive}" /> Активний
+				</label>
         </div>
 
         <!-- Таблиця сертифікатів -->
@@ -140,7 +143,7 @@
                     <input type="hidden" th:field="*{dbUserRoles[__${iStat.index}__].id}" />
                     <select th:field="*{dbUserRoles[__${iStat.index}__].databaseRole.id}" required>
                         <option value="">-- Виберіть роль --</option>
-                        <option th:each="r : ${databaseRoles}" th:value="${r.id}" th:text="${r.name}"
+                        <option th:each="r : ${databaseRoles}" th:value="${r.id}" th:text="${r.name + ': (' + r.database.name + ')'}"
                                 th:selected="${role.databaseRole != null} ? ${r.id} == ${role.databaseRole.id} : false"></option>
                     </select>
                 </td>

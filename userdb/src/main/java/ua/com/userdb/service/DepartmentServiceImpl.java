@@ -57,6 +57,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 			updated.setChildren(department.getChildren());
 			updated.setName(department.getName());
 			updated.setParent(department.getParent());
+			updated.setIsActive(department.getIsActive());
 			departmentRepository.save(updated);
 			return Optional.of(updated);
 		}

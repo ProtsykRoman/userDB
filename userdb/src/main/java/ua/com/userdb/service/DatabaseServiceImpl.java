@@ -44,6 +44,7 @@ public class DatabaseServiceImpl implements DatabaseService{
 		if(exitingDatabase.isPresent()) {
 			Database updated = exitingDatabase.get();
 			updated.setName(database.getName());
+			updated.setIsActive(database.getIsActive());
 			databaseRepository.save(updated);
 			return Optional.of(updated);
 		}else {

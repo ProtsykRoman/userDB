@@ -59,6 +59,15 @@
     margin-top: 20px;
 }
 
+.checkbox-inline {
+    display: flex;
+    align-items: center; /* вирівнювання по центру вертикально */
+    gap: 5px; /* відстань між чекбоксом і текстом */
+    margin-top: 5px; /* невеликий відступ від попереднього поля */
+    font-weight: 500;
+    color: #2c3e50;
+}
+
 .form-buttons .btn-add,
 .form-buttons .btn-submit {
     background-color: #4a6fa5;

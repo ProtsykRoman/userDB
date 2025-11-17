@@ -25,6 +25,8 @@ public class DatabaseRole {
 	private Integer id;
 	@Column(name="name", nullable = false)
 	private String name;
+	@Column(name = "is_active")
+	private Boolean isActive = true;
 	@ManyToOne
 	@JoinColumn(name="database_id", referencedColumnName = "id", nullable = false)
 	private Database database;

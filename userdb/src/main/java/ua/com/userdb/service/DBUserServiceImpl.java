@@ -53,6 +53,7 @@ public class DBUserServiceImpl implements DBUserService {
 			existing.setIdentificationNumber(dbUser.getIdentificationNumber());
 			existing.setName(dbUser.getName());
 			existing.setRank(dbUser.getRank());
+			existing.setIsActive(dbUser.getIsActive());
 
 			// --- оновлення доступів ---
 			existing.getDbUserAccesses().clear();

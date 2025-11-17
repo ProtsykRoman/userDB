@@ -26,10 +26,9 @@
             <tr th:each="rank : ${ranks}">
                 <td th:text="${rank.id}"></td>
                 <td th:text="${rank.name}"></td>
+                <td th:text="${certificateType.isActive} ? 'Так' : 'Ні'"></td>
                 <td class="table-actions">
                     <a th:href="@{'/ranks/edit/' + ${rank.id}}" class="btn-edit">Редагувати</a>
-                    <a th:href="@{'/ranks/delete/' + ${rank.id}}" class="btn-delete"
-                       onclick="return confirm('Видалити це звання?');">Видалити</a>
                 </td>
             </tr>
         </tbody>

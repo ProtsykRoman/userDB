@@ -50,6 +50,7 @@ public class DatabaseRoleServiceImpl implements DatabaseRoleService {
 			DatabaseRole updated = exitingDatabaseRole.get();
 			updated.setName(databaseRole.getName());
 			updated.setDatabase(databaseRole.getDatabase());
+			updated.setIsActive(databaseRole.getIsActive());
 			databaseRoleRepository.save(updated);
 			
 			return Optional.of(updated);

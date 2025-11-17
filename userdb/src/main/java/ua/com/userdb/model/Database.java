@@ -23,4 +23,6 @@ public class Database {
 	private Integer id;
 	@Column(name="name", nullable = false)
 	private String name;
+	@Column(name = "is_active")
+	private Boolean isActive = true;
 }

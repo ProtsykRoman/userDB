@@ -21,6 +21,7 @@
             <th>ID</th>
             <th>Назва</th>
             <th>База даних</th>
+            <th>Активний</th>
             <th>Дії</th>
         </tr>
         </thead>
@@ -29,11 +30,9 @@
             <td th:text="${role.id}"></td>
             <td th:text="${role.name}"></td>
             <td th:text="${role.database != null ? role.database.name : '—'}"></td>
+            <td th:text="${certificateType.isActive} ? 'Так' : 'Ні'"></td>
             <td class="table-actions">
                 <a th:href="@{'/database-roles/edit/' + ${role.id}}" class="btn-edit">Редагувати</a>
-                <a th:href="@{'/database-roles/delete/' + ${role.id}}"
-                   class="btn-delete"
-                   onclick="return confirm('Видалити цю роль?')">Видалити</a>
             </td>
         </tr>
         </tbody>

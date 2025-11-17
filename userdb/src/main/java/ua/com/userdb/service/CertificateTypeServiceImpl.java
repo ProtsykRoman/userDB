@@ -44,6 +44,7 @@ public class CertificateTypeServiceImpl implements CertificateTypeService{
 	    if (existingCertificateType.isPresent()) {
 	        CertificateType updated = existingCertificateType.get();
 	        updated.setName(certificateType.getName());
+	        updated.setIsActive(certificateType.getIsActive());
 
 	        certificateTypeRepository.save(updated);
 	        return Optional.of(updated);

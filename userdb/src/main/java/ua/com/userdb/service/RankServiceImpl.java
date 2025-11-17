@@ -42,6 +42,7 @@ public class RankServiceImpl implements RankService{
 		if(exitingRank.isPresent()) {
 			Rank updated = exitingRank.get();
 			updated.setName(rank.getName());
+			updated.setIsActive(rank.getIsActive());
 			rankRepository.save(updated);
 			return Optional.of(updated);
 			}else {

@@ -26,13 +26,9 @@
         <tr th:each="database : ${databases}">
             <td th:text="${database.id}"></td>
             <td th:text="${database.name}"></td>
+            <td th:text="${certificateType.isActive} ? 'Так' : 'Ні'"></td>
             <td class="table-actions">
                 <a th:href="@{'/databases/edit/' + ${database.id}}" class="btn-edit">Редагувати</a>
-                <a th:href="@{'/databases/delete/' + ${database.id}}"
-                   class="btn-delete"
-                   onclick="return confirm('Ви впевнені, що хочете видалити цю базу даних?');">
-                    Видалити
-                </a>
             </td>
         </tr>
         </tbody>

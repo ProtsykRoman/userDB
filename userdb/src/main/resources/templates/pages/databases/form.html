@@ -1,29 +1,31 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
 <head>
-    <title layout:fragment="title" th:text="${database.id} == null ? 'Створити базу даних' : 'Редагувати базу даних'"></title>
-    <link rel="stylesheet" th:href="@{/css/forms.css}">
+<title layout:fragment="title"
+	th:text="${database.id} == null ? 'Створити базу даних' : 'Редагувати базу даних'"></title>
+<link rel="stylesheet" th:href="@{/css/forms.css}">
 </head>
 <body>
-<div layout:fragment="content" class="form-container">
+	<div layout:fragment="content" class="form-container">
 
-    <h2 th:text="${database.id} == 0 ? 'Створити базу даних' : 'Редагувати базу даних'"></h2>
+		<h2
+			th:text="${database.id} == 0 ? 'Створити базу даних' : 'Редагувати базу даних'"></h2>
 
-    <form th:object="${database}" th:action="@{/databases}" method="post">
+		<form th:object="${database}" th:action="@{/databases}" method="post">
 
-        <input type="hidden" th:field="*{id}"/>
+			<input type="hidden" th:field="*{id}" /> <label for="name">Назва:</label>
+			<input type="text" id="name" th:field="*{name}" required /> <label>
+				<input type="checkbox" th:field="*{isActive}" /> Активний
+			</label>
 
-        <label for="name">Назва:</label>
-        <input type="text" id="name" th:field="*{name}" required/>
+			<div class="form-buttons">
+				<button type="submit" class="btn-add">Зберегти</button>
+				<a th:href="@{/databases}" class="btn-cancel">Скасувати</a>
+			</div>
+		</form>
 
-        <div class="form-buttons">
-            <button type="submit" class="btn-add">Зберегти</button>
-            <a th:href="@{/databases}" class="btn-cancel">Скасувати</a>
-        </div>
-    </form>
-
-</div>
+	</div>
 </body>
 </html>

@@ -2,29 +2,34 @@ CREATE SCHEMA IF NOT EXISTS userdb;
 
 CREATE TABLE IF NOT EXISTS certificate_types (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL
+    name VARCHAR(100) NOT NULL,
+    boolean is_active
 );
 
 CREATE TABLE IF NOT EXISTS databases (
 	id SERIAL PRIMARY KEY,
-	name VARCHAR(100) NOT NULL
+	name VARCHAR(100) NOT NULL,
+	boolean is_active
 )
 
 CREATE TABLE IF NOT EXISTS databaseroles (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(255) NOT NULL,
-	database_id INTEGER REFERENCES databases(id)
+	database_id INTEGER REFERENCES databases(id),
+	boolean is_active
 )
 
 CREATE TABLE IF NOT EXISTS ranks (
 	id SERIAL PRIMARY KEY,
-	name VARCHAR(255) NOT NULL
+	name VARCHAR(255) NOT NULL,
+	boolean is_active
 )
 
 CREATE TABLE IF NOT EXISTS departments (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(255) NOT NULL,
-	parent_id INTEGER REFERENCES departments(id)
+	parent_id INTEGER REFERENCES departments(id),
+	boolean is_active
 )
 
 CREATE TABLE IF NOT EXISTS dbusers (
@@ -32,7 +37,8 @@ CREATE TABLE IF NOT EXISTS dbusers (
 	name VARCHAR(255) NOT NULL,
 	rank_id INTEGER REFERENCES ranks(id),
 	department_id INTEGER REFERENCES departments(id),
-	identificationNumber INTEGER
+	identificationNumber INTEGER,
+	boolean is_active
 )
 
 CREATE TABLE IF NOT EXISTS db_users_access(
