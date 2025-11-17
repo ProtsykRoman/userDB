@@ -18,8 +18,9 @@
 			method="post">
 
 			<input type="hidden" th:field="*{id}" /> <label for="name">Назва:</label>
-			<input type="text" id="name" th:field="*{name}" required /> <label>
-				<input type="checkbox" th:field="*{isActive}" /> Активний
+			<input type="text" id="name" th:field="*{name}" required /> <label
+				class="checkbox-inline"> <input type="checkbox"
+				th:field="*{isActive}" /> Активний
 			</label>
 
 			<div class="form-buttons">

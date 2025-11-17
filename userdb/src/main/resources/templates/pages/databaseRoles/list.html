@@ -30,7 +30,7 @@
             <td th:text="${role.id}"></td>
             <td th:text="${role.name}"></td>
             <td th:text="${role.database != null ? role.database.name : '—'}"></td>
-            <td th:text="${certificateType.isActive} ? 'Так' : 'Ні'"></td>
+            <td th:text="${role.isActive} ? 'Так' : 'Ні'"></td>
             <td class="table-actions">
                 <a th:href="@{'/database-roles/edit/' + ${role.id}}" class="btn-edit">Редагувати</a>
             </td>

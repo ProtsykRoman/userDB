@@ -26,8 +26,8 @@
 				<option th:each="dept : ${allDepartments}" th:value="${dept.id}"
 					th:selected="${department.parent != null} ? ${dept.id} == ${department.parent.id} : false"
 					th:text="${'--'.repeat(dept.level) + dept.name}"></option>
-			</select> <label> <input type="checkbox" th:field="*{isActive}" />
-				Активний
+			</select> <label class="checkbox-inline"> <input type="checkbox"
+				th:field="*{isActive}" /> Активний
 			</label>
 
 			<div class="form-buttons">

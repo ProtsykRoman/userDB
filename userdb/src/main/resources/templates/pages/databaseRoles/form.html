@@ -31,8 +31,8 @@
 					th:text="${db.name}"
 					th:selected="${databaseRole.database != null} ? ${db.id} == ${databaseRole.database.id} : false">
 				</option>
-			</select> <label> <input type="checkbox" th:field="*{isActive}" />
-				Активний
+			</select> <label class="checkbox-inline"> <input type="checkbox"
+				th:field="*{isActive}" /> Активний
 			</label>
 
 			<div class="form-buttons">

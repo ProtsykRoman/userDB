@@ -1,7 +1,12 @@
 package ua.com.userdb.controller;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +15,15 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ua.com.userdb.model.CertificateType;
 import ua.com.userdb.model.DBUser;
+import ua.com.userdb.model.DBUserAccess;
+import ua.com.userdb.model.DBUserCertificate;
+import ua.com.userdb.model.DBUserRole;
+import ua.com.userdb.model.Database;
+import ua.com.userdb.model.DatabaseRole;
+import ua.com.userdb.model.Department;
+import ua.com.userdb.model.Rank;
 import ua.com.userdb.service.*;
 
 @Controller
@@ -52,7 +65,7 @@ public class DBUserController {
         dbUser.setDbUserCertificates(new ArrayList<>()); // Ініціалізація порожнього списку
         dbUser.setDbUserRoles(new ArrayList<>()); // Ініціалізація порожнього списку
         model.addAttribute("dbUser", dbUser);
-        addFormAttributes(model);
+        addFormAttributes(model, dbUser);
         return "pages/dbuser/form";
     }
 
@@ -71,7 +84,7 @@ public class DBUserController {
                 dbUser.setDbUserRoles(new ArrayList<>());
             }
             model.addAttribute("dbUser", dbUser);
-            addFormAttributes(model);
+            addFormAttributes(model, dbUser);
             return "pages/dbuser/form";
         } else {
             return "redirect:/dbusers";
@@ -96,20 +109,80 @@ public class DBUserController {
         return "redirect:/dbusers";
     }
 
-    private void addFormAttributes(Model model) throws JsonProcessingException {
-        model.addAttribute("ranks", rankService.findAll());
-        model.addAttribute("allDepartments", departmentService.getDepartmentsHierarchy());
+    private void addFormAttributes(Model model, DBUser dbUser) throws JsonProcessingException {
+    	List<Rank> ranks = mergeActiveWithSelected(
+    	        rankService.findAll(),
+    	        dbUser.getRank(),
+    	        Rank::getIsActive
+    	);
+    	model.addAttribute("ranks", ranks);
+    	
+    	List<Department> departments = mergeActiveWithSelected(
+    	        departmentService.findAll(),
+    	        dbUser.getDepartment(),
+    	        Department::getIsActive
+    	);
+        model.addAttribute("allDepartments", departments);
         
-        model.addAttribute("databases", databaseService.findAllDatabase());
-        model.addAttribute("databasesJson", objectMapper.writeValueAsString(databaseService.findAllDatabase()));
+        Database selectedDatabase = dbUser.getDbUserAccesses().stream()
+                .map(DBUserAccess::getDatabase)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
+
+        List<Database> databases = mergeActiveWithSelected(
+                databaseService.findAllDatabase(),
+                selectedDatabase,
+                Database::getIsActive
+        );
+        model.addAttribute("databases", databases);
+        model.addAttribute("databasesJson", objectMapper.writeValueAsString(databases));
         
-        // Для ролей бази даних
-        model.addAttribute("databaseRoles", databaseRoleService.findAllDatabaseRole());
-        model.addAttribute("databaseRolesJson", objectMapper.writeValueAsString(databaseRoleService.findAllDatabaseRole()));
+        DatabaseRole selectedDatabaseRole = dbUser.getDbUserRoles().stream()
+                .map(DBUserRole::getDatabaseRole)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
 
-        // Для сертифікатів
-        model.addAttribute("certificateTypes", certificateTypeService.findAllCertificateType());
-        model.addAttribute("certificateTypesJson", objectMapper.writeValueAsString(certificateTypeService.findAllCertificateType()));
+        List<DatabaseRole> databaseRoles = mergeActiveWithSelected(
+        		databaseRoleService.findAllDatabaseRole(),
+        		selectedDatabaseRole,
+        		DatabaseRole::getIsActive
+        );
+        model.addAttribute("databaseRoles", databaseRoles);
+        model.addAttribute("databaseRolesJson", objectMapper.writeValueAsString(databaseRoles));
 
+        CertificateType selectedCertificateType = dbUser.getDbUserCertificates().stream()
+                .map(DBUserCertificate::getCertificateType)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
+
+        List<CertificateType> certificateTypes = mergeActiveWithSelected(
+        		certificateTypeService.findAllCertificateType(),
+        		selectedCertificateType,
+        		CertificateType::getIsActive
+        );
+        model.addAttribute("certificateTypes", certificateTypes);
+        model.addAttribute("certificateTypesJson", objectMapper.writeValueAsString(certificateTypes));
+
+    }
+    
+    private <T> List<T> mergeActiveWithSelected(
+            List<T> allItems,
+            T selectedItem,
+            Predicate<T> activePredicate
+    ) {
+        List<T> result = allItems.stream()
+                .filter(activePredicate)
+                .collect(Collectors.toList());
+
+        if (selectedItem != null && !activePredicate.test(selectedItem)) {
+            if (!result.contains(selectedItem)) {
+                result.add(selectedItem);
+            }
+        }
+
+        return result;
     }
 }

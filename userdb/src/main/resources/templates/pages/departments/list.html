@@ -20,6 +20,7 @@
                 <th>ID</th>
                 <th>Назва</th>
                 <th>Батьківський підрозділ</th>
+                <th>Активний</th>
                 <th>Дії</th>
             </tr>
         </thead>
@@ -28,7 +29,7 @@
                 <td th:text="${dept.id}"></td>
                 <td th:text="${dept.name}"></td>
                 <td th:text="${dept.parent != null ? dept.parent.name : '---'}"></td>
-                <td th:text="${certificateType.isActive} ? 'Так' : 'Ні'"></td>
+                <td th:text="${dept.isActive} ? 'Так' : 'Ні'"></td>
                 <td class="table-actions">
                     <a th:href="@{'/departments/edit/' + ${dept.id}}" class="btn-edit">Редагувати</a>
                 </td>

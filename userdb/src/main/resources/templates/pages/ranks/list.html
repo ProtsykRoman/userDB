@@ -19,6 +19,7 @@
             <tr>
                 <th>ID</th>
                 <th>Назва</th>
+                <th>Активний</th>
                 <th>Дії</th>
             </tr>
         </thead>
@@ -26,7 +27,7 @@
             <tr th:each="rank : ${ranks}">
                 <td th:text="${rank.id}"></td>
                 <td th:text="${rank.name}"></td>
-                <td th:text="${certificateType.isActive} ? 'Так' : 'Ні'"></td>
+                <td th:text="${rank.isActive} ? 'Так' : 'Ні'"></td>
                 <td class="table-actions">
                     <a th:href="@{'/ranks/edit/' + ${rank.id}}" class="btn-edit">Редагувати</a>
                 </td>

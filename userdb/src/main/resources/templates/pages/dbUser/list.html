@@ -21,6 +21,7 @@
                 <th>Звання</th>
                 <th>Підрозділ</th>
                 <th>Ідентифікаційний номер</th>
+                <th>Активний</th>
                 <th>Дії</th>
             </tr>
         </thead>
@@ -32,7 +33,7 @@
                 <!-- Ієрархічний департамент -->
                 <td th:text="${user.department != null ? '--'.repeat(user.department.level) + user.department.name : ''}"></td>
                 <td th:text="${user.identificationNumber}"></td>
-                <td th:text="${certificateType.isActive} ? 'Так' : 'Ні'"></td>
+                <td th:text="${user.isActive} ? 'Так' : 'Ні'"></td>
                 <td class="table-actions">
                     <a th:href="@{/dbusers/edit/{id}(id=${user.id})}" class="btn-edit">Редагувати</a>
                 </td>

@@ -19,6 +19,7 @@
         <tr>
             <th>ID</th>
             <th>Назва</th>
+            <th>Активний</th>
             <th>Дії</th>
         </tr>
         </thead>
@@ -26,7 +27,7 @@
         <tr th:each="database : ${databases}">
             <td th:text="${database.id}"></td>
             <td th:text="${database.name}"></td>
-            <td th:text="${certificateType.isActive} ? 'Так' : 'Ні'"></td>
+            <td th:text="${database.isActive} ? 'Так' : 'Ні'"></td>
             <td class="table-actions">
                 <a th:href="@{'/databases/edit/' + ${database.id}}" class="btn-edit">Редагувати</a>
             </td>

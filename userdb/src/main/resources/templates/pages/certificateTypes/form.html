@@ -18,12 +18,12 @@
 
 			<div class="form-group">
 				<label for="name">Назва:</label> <input type="text" id="name"
-					th:field="*{name}" required /> <label> <input
-					type="checkbox" th:field="*{isActive}" /> Активний
+					th:field="*{name}" required /> <label class="checkbox-inline">
+					<input type="checkbox" th:field="*{isActive}" /> Активний
 				</label>
 			</div>
 
-			<div class="checkbox-inline">
+			<div class="form-buttons">
 				<button type="submit" class="btn-submit">Зберегти</button>
 				<a th:href="@{/certificate-types}" class="btn-cancel">Скасувати</a>
 			</div>
