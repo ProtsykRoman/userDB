@@ -2,6 +2,8 @@ package ua.com.userdb.model;
 
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,7 +27,7 @@ import lombok.Setter;
 public class DBUserAccess {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	@ManyToOne
 	@JoinColumn(name="dbuser_id", nullable = false)
 	private DBUser dbUser;
@@ -33,5 +35,6 @@ public class DBUserAccess {
 	@JoinColumn(name="database_id", nullable = false)
 	private Database database;
 	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date accessExpirationDate;
 }

@@ -20,7 +20,7 @@ import lombok.Setter;
 public class CertificateType {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	@Column(name = "name", nullable = false)
 	private String name;
 }

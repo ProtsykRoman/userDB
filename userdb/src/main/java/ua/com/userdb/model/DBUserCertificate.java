@@ -2,6 +2,8 @@ package ua.com.userdb.model;
 
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +28,7 @@ import lombok.Setter;
 public class DBUserCertificate {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	@ManyToOne
 	@JoinColumn(name="dbuser_id", nullable = false)
 	private DBUser dbUser;
@@ -34,6 +36,7 @@ public class DBUserCertificate {
 	@JoinColumn(name="certificate_type_id", nullable = false)
 	private CertificateType certificateType;
 	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date expirationDate;
 	@Column(name="number")
 	private String number;

@@ -22,7 +22,7 @@ import lombok.Setter;
 public class DBUserRole {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	@ManyToOne
 	@JoinColumn(name="dbuser_id", nullable = false)
 	private DBUser dbUser;

@@ -22,7 +22,7 @@ import lombok.Setter;
 public class DatabaseRole {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	@Column(name="name", nullable = false)
 	private String name;
 	@ManyToOne

@@ -1,102 +1,174 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layout}">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
 <head>
-<title layout:fragment="title"
-	th:text="${dbUser.id == null} ? 'Створити користувача бази даних' : 'Редагувати користувача бази даних'">
-</title>
-<link rel="stylesheet" th:href="@{/css/forms.css}">
+    <title layout:fragment="title"
+          th:text="${dbUser.id == null} ? 'Створити користувача бази даних' : 'Редагувати користувача бази даних'">
+    </title>
+    <link rel="stylesheet" th:href="@{/css/form-userDB.css}">
 </head>
 <body>
-	<div layout:fragment="content" class="form-container">
+<div layout:fragment="content" class="form-container">
 
-		<h2
-			th:text="${dbUser.id == null} ? 'Створити користувача бази даних' : 'Редагувати користувача бази даних'"></h2>
+    <h2 th:text="${dbUser.id == null} ? 'Створити користувача бази даних' : 'Редагувати користувача бази даних'"></h2>
 
-		<div th:if="${error}" class="form-error">
-			<p th:text="${error}"></p>
-		</div>
+    <div th:if="${error}" class="form-error">
+        <p th:text="${error}"></p>
+    </div>
 
-		<form th:object="${dbUser}"
-			th:action="${dbUser.id == null} ? @{/dbusers} : @{/dbusers/update/{id}(id=${dbUser.id})}"
-			method="post">
+    <form th:object="${dbUser}"
+          th:action="${dbUser.id == null} ? @{/dbusers} : @{/dbusers/update/{id}(id=${dbUser.id})}"
+          method="post">
 
-			<input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{id}" />
 
-			<!-- Ім’я -->
-			<label for="name">Ім’я:</label> <input type="text" id="name"
-				th:field="*{name}" required />
+        <!-- Перший рядок: ПІБ + Ідентифікаційний номер -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="name">ПІБ:</label>
+                <input type="text" id="name" th:field="*{name}" required />
+            </div>
 
-			<!-- Ранг -->
-			<label for="rank">Ранг:</label> <select id="rank"
-				th:field="*{rank.id}">
-				<option value="">-- Виберіть ранг --</option>
-				<option th:each="r : ${ranks}" th:value="${r.id}"
-					th:text="${r.name}"
-					th:selected="${dbUser.rank != null} ? ${r.id} == ${dbUser.rank.id} : false">
-				</option>
-			</select>
+            <div class="form-group">
+                <label for="identificationNumber">Ідентифікаційний номер:</label>
+                <input type="number" id="identificationNumber" th:field="*{identificationNumber}" />
+            </div>
+        </div>
 
-			<!-- Департамент -->
-			<label for="department">Департамент:</label> <select id="department"
-				th:field="*{department.id}" required>
-				<option th:value="0" th:text="'--- Виберіть департамент ---'"
-					th:selected="${dbUser.department == null || dbUser.department.id == 0}">
-				</option>
-				<option th:each="dept : ${allDepartments}" th:value="${dept.id}"
-					th:selected="${dbUser.department != null} ? ${dept.id} == ${dbUser.department.id} : false"
-					th:text="${'--'.repeat(dept.level) + dept.name}"></option>
-			</select>
+        <!-- Другий рядок: Ранг + Департамент -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="rank">Звання:</label>
+                <select id="rank" th:field="*{rank.id}">
+                    <option value="">-- Виберіть звання --</option>
+                    <option th:each="r : ${ranks}" th:value="${r.id}"
+                            th:text="${r.name}"
+                            th:selected="${dbUser.rank != null} ? ${r.id} == ${dbUser.rank.id} : false"></option>
+                </select>
+            </div>
 
-			<!-- Ідентифікаційний номер -->
-			<label for="identificationNumber">Identification Number:</label> <input
-				type="number" id="identificationNumber"
-				th:field="*{identificationNumber}" />
+            <div class="form-group">
+                <label for="department">Підрозділ:</label>
+                <select id="department" th:field="*{department.id}" required>
+                    <option th:value="0" th:text="'--- Виберіть підрозділ ---'"
+                            th:selected="${dbUser.department == null || dbUser.department.id == 0}">
+                    </option>
+                    <option th:each="dept : ${allDepartments}" th:value="${dept.id}"
+                            th:selected="${dbUser.department != null} ? ${dept.id} == ${dbUser.department.id} : false"
+                            th:text="${'--'.repeat(dept.level) + dept.name}"></option>
+                </select>
+            </div>
+        </div>
 
-			<div class="form-buttons">
-				<button type="submit" class="btn-add">Зберегти</button>
-				<a th:href="@{/dbusers}" class="btn-cancel">Скасувати</a>
-			</div>
+        <!-- Таблиця сертифікатів -->
+        <h3>Сертифікати користувача</h3>
+        <button type="button" class="btn-add" id="addCertBtn">Додати сертифікат</button>
+        <table id="certTable" class="data-table">
+            <thead>
+            <tr>
+                <th>Тип сертифіката</th>
+                <th>Номер</th>
+                <th>Дата закінчення</th>
+                <th>Заблоковано</th>
+                <th>Дія</th>
+            </tr>
+            </thead>
+            <tbody id="certBody">
+            <tr th:each="cert, iStat : *{dbUserCertificates}">
+                <td>
+                    <input type="hidden" th:field="*{dbUserCertificates[__${iStat.index}__].id}" />
+                    <select th:field="*{dbUserCertificates[__${iStat.index}__].certificateType.id}" required>
+                        <option value="">-- Виберіть тип сертифіката --</option>
+                        <option th:each="c : ${certificateTypes}" th:value="${c.id}"
+                                th:text="${c.name}"
+                                th:selected="${cert.certificateType != null} ? ${c.id} == ${cert.certificateType.id} : false"></option>
+                    </select>
+                </td>
+                <td><input type="text" th:field="*{dbUserCertificates[__${iStat.index}__].number}" /></td>
+                <td><input type="date" th:field="*{dbUserCertificates[__${iStat.index}__].expirationDate}" /></td>
+                <td><input type="checkbox" th:field="*{dbUserCertificates[__${iStat.index}__].isBlocked}" /></td>
+                <td class="action-cell">
+                    <button type="button" class="btn-delete" onclick="removeCertRow(this)">Видалити</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-			<!-- Таблиця доступів -->
-			<h3>Доступи до баз даних</h3>
+        <!-- Таблиця доступів -->
+        <h3>Доступи до баз даних</h3>
+        <button type="button" class="btn-add" id="addAccessBtn">Додати доступ</button>
+        <table id="accessTable" class="data-table">
+            <thead>
+            <tr>
+                <th>База даних</th>
+                <th>Дата завершення доступу</th>
+                <th>Дія</th>
+            </tr>
+            </thead>
+            <tbody id="accessBody">
+            <tr th:each="access, iStat : *{dbUserAccesses}">
+                <td>
+                    <input type="hidden" th:field="*{dbUserAccesses[__${iStat.index}__].id}" />
+                    <select th:field="*{dbUserAccesses[__${iStat.index}__].database.id}" required>
+                        <option value="">-- Виберіть базу даних --</option>
+                        <option th:each="db : ${databases}" th:value="${db.id}" th:text="${db.name}"
+                                th:selected="${access.database != null} ? ${db.id} == ${access.database.id} : false"></option>
+                    </select>
+                </td>
+                <td><input type="date" th:field="*{dbUserAccesses[__${iStat.index}__].accessExpirationDate}" /></td>
+                <td class="action-cell">
+                    <button type="button" class="btn-delete" onclick="removeAccessRow(this)">Видалити</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-			<table id="accessTable" class="data-table">
-				<thead>
-					<tr>
-						<th>База даних</th>
-						<th>Дата завершення доступу</th>
-						<th>Дія</th>
-					</tr>
-				</thead>
-				<tbody id="accessBody">
-					<tr th:each="access, iStat : *{dbUserAccesses}">
-						<td><select
-							th:field="*{dbUserAccesses[__${iStat.index}__].database.id}"
-							required>
-								<option value="">-- Виберіть базу даних --</option>
-								<option th:each="db : ${databases}" th:value="${db.id}"
-									th:text="${db.name}"
-									th:selected="${access.database != null} ? ${db.id} == ${access.database.id} : false">
-								</option>
-						</select></td>
-						<td><input type="date"
-							th:field="*{dbUserAccesses[__${iStat.index}__].accessExpirationDate}" />
-						</td>
-						<td>
-							<button type="button" class="btn-delete"
-								onclick="removeAccessRow(this)">Видалити</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+        <!-- Таблиця ролей -->
+        <h3>Ролі користувача</h3>
+        <button type="button" class="btn-add" id="addRoleBtn">Додати роль</button>
+        <table id="roleTable" class="data-table">
+            <thead>
+            <tr>
+                <th>Роль</th>
+                <th>Дія</th>
+            </tr>
+            </thead>
+            <tbody id="roleBody">
+            <tr th:each="role, iStat : *{dbUserRoles}">
+                <td>
+                    <input type="hidden" th:field="*{dbUserRoles[__${iStat.index}__].id}" />
+                    <select th:field="*{dbUserRoles[__${iStat.index}__].databaseRole.id}" required>
+                        <option value="">-- Виберіть роль --</option>
+                        <option th:each="r : ${databaseRoles}" th:value="${r.id}" th:text="${r.name}"
+                                th:selected="${role.databaseRole != null} ? ${r.id} == ${role.databaseRole.id} : false"></option>
+                    </select>
+                </td>
+                <td class="action-cell">
+                    <button type="button" class="btn-delete" onclick="removeRoleRow(this)">Видалити</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-			<button type="button" class="btn-add" id="addAccessBtn">Додати
-				доступ</button>
+        <div class="form-buttons">
+            <button type="submit" class="btn-add">Зберегти</button>
+            <a th:href="@{/dbusers}" class="btn-cancel">Скасувати</a>
+        </div>
 
+    </form>
+</div>
 
-		</form>
-	</div>
+<div layout:fragment="scripts">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const databases = JSON.parse(/*[[${databasesJson}]]*/'[]');
+        const databaseRoles = JSON.parse(/*[[${databaseRolesJson}]]*/'[]');
+        const certificateTypes = JSON.parse(/*[[${certificateTypesJson}]]*/'[]');
+        /*]]>*/
+    </script>
+
+    <script th:src="@{/js/dbuser-form.js}"></script>
+</div>
 </body>
 </html>
