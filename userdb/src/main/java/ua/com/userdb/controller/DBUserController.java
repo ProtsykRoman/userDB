@@ -52,9 +52,55 @@ public class DBUserController {
     }
 
     @GetMapping
-    public String listDBUsers(Model model) {
-        model.addAttribute("dbUsers", dbUserService.findAll());
+    public String listDBUsers(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String rank,
+            @RequestParam(required = false) String department,
+            @RequestParam(required = false) String identificationNumber,
+            @RequestParam(required = false) String isActive,
+            Model model
+    ) {
+        List<DBUser> users = dbUserService.findAll();
+
+        if (name != null && !name.isEmpty()) {
+            users = users.stream()
+                    .filter(u -> u.getName() != null &&
+                            u.getName().toLowerCase().contains(name.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        if (rank != null && !rank.isEmpty()) {
+            users = users.stream()
+                    .filter(u -> u.getRank() != null &&
+                            u.getRank().getName().toLowerCase().contains(rank.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        if (department != null && !department.isEmpty()) {
+            users = users.stream()
+                    .filter(u -> u.getDepartment() != null &&
+                            u.getDepartment().getName().toLowerCase().contains(department.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        if (identificationNumber != null && !identificationNumber.isEmpty()) {
+            users = users.stream()
+                    .filter(u -> u.getIdentificationNumber() != null &&
+                            String.valueOf(u.getIdentificationNumber())
+                                    .contains(identificationNumber))
+                    .collect(Collectors.toList());
+        }
+
+        if (isActive != null && !isActive.isEmpty()) {
+            boolean active = Boolean.parseBoolean(isActive);
+            users = users.stream()
+                    .filter(u -> Boolean.TRUE.equals(u.getIsActive()) == active)
+                    .collect(Collectors.toList());
+        }
+
+        model.addAttribute("dbUsers", users);
         model.addAttribute("activePage", "dbUsers");
+
         return "pages/dbuser/list";
     }
 

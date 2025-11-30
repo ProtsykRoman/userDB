@@ -37,7 +37,7 @@ public class DBUser {
 	@JoinColumn(name = "department_id", referencedColumnName = "id", nullable = false)
 	private Department department;
 	@Column(name = "identificationNumber")
-	private int identificationNumber;
+	private Integer identificationNumber;
 	@Column(name = "is_active")
 	private Boolean isActive = true;
 	@OneToMany(mappedBy = "dbUser", cascade = CascadeType.ALL, orphanRemoval = true)

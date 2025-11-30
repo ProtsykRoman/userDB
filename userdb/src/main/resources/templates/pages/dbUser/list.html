@@ -13,8 +13,12 @@
 
     <a class="btn-add" th:href="@{/dbusers/new}">+ Додати нового користувача</a>
 
-    <table class="list-table">
-        <thead>
+    <!-- Фільтр прямо в таблиці -->
+    <form th:action="@{/dbusers}" method="get">
+        <table class="list-table">
+            <thead>
+
+            <!-- Заголовки -->
             <tr>
                 <th>ID</th>
                 <th>ПІБ</th>
@@ -24,22 +28,73 @@
                 <th>Активний</th>
                 <th>Дії</th>
             </tr>
-        </thead>
-        <tbody>
+
+            <!-- Ряд фільтрів -->
+            <tr class="filter-row">
+                <td></td>
+
+                <!-- ПІБ -->
+                <td>
+                    <input type="text" name="name" placeholder="Пошук..."
+                           th:value="${param.name}">
+                </td>
+
+                <!-- Звання -->
+                <td>
+                    <input type="text" name="rank" placeholder="Пошук..."
+                           th:value="${param.rank}">
+                </td>
+
+                <!-- Підрозділ -->
+                <td>
+                    <input type="text" name="department" placeholder="Пошук..."
+                           th:value="${param.department}">
+                </td>
+
+                <!-- Ідентифікаційний -->
+                <td>
+                    <input type="text" name="identificationNumber" placeholder="Пошук..."
+                           th:value="${param.identificationNumber}">
+                </td>
+
+                <!-- Активний -->
+                <td>
+                    <select name="isActive">
+                        <option value="">(всі)</option>
+                        <option value="true" th:selected="${param.isActive == 'true'}">Так</option>
+                        <option value="false" th:selected="${param.isActive == 'false'}">Ні</option>
+                    </select>
+                </td>
+
+                <!-- Дії -->
+                <td class="filter-actions">
+                    <button type="submit" class="btn-search">🔍</button>
+                    <a th:href="@{/dbusers}" class="btn-clear">✖</a>
+                </td>
+            </tr>
+
+            </thead>
+
+            <tbody>
             <tr th:each="user : ${dbUsers}">
                 <td th:text="${user.id}"></td>
                 <td th:text="${user.name}"></td>
                 <td th:text="${user.rank?.name}"></td>
-                <!-- Ієрархічний департамент -->
+
                 <td th:text="${user.department != null ? '--'.repeat(user.department.level) + user.department.name : ''}"></td>
+
                 <td th:text="${user.identificationNumber}"></td>
+
                 <td th:text="${user.isActive} ? 'Так' : 'Ні'"></td>
+
                 <td class="table-actions">
                     <a th:href="@{/dbusers/edit/{id}(id=${user.id})}" class="btn-edit">Редагувати</a>
                 </td>
             </tr>
-        </tbody>
-    </table>
+            </tbody>
+
+        </table>
+    </form>
 
 </div>
 </body>
