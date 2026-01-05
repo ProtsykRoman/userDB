@@ -1,73 +1,356 @@
-/* === Фільтр над таблицею === */
-.list-table .filter-row td {
-    background: #f7f9fc;
-    padding: 6px;
-}
+/* ============================================================
+   ГЛОБАЛЬНІ СТИЛІ ДЛЯ СТОРІНОК СПИСКУ ТА ФОРМИ КОРИСТУВАЧІВ БД
+   ============================================================ */
 
-.list-table .filter-row input,
-.list-table .filter-row select {
-    width: 100%;
-    padding: 6px;
-    border: 1px solid #cfd4da;
-    border-radius: 4px;
-    font-size: 13px;
-    box-sizing: border-box;
-}
-
-.list-table .filter-row input:focus,
-.list-table .filter-row select:focus {
-    border-color: #4a6fa5;
-    box-shadow: 0 0 4px rgba(74,111,165,0.3);
-    outline: none;
-}
-
-/* Кнопки пошуку та очистки */
-.filter-actions {
-    text-align: center;
-}
-
-.btn-search,
-.btn-clear {
-    display: inline-block;
-    padding: 6px 10px;
+/* --- Базові кнопки --- */
+.btn-add,
+.btn-submit {
+    background-color: #4a6fa5;
+    color: #ffffff !important;
+    padding: 8px 16px;
     border-radius: 6px;
-    font-size: 14px;
+    border: none;
+    font-weight: 500;
     cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s, transform 0.2s;
     text-decoration: none;
-    margin: 0 2px;
 }
 
-/* Пошук */
+.btn-add:hover,
+.btn-submit:hover {
+    background-color: #3a5c8e;
+    transform: translateY(-1px);
+}
+
+.btn-clear {
+    padding: 7px 14px;
+    background: #b0b0b0;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.btn-clear:hover {
+    background: #8c8c8c;
+}
+
+/* ============================================================
+   СТОРІНКА СПИСКУ КОРИСТУВАЧІВ
+   ============================================================ */
+
+.list-container {
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    max-width: 1050px;
+    margin: 20px auto;
+}
+
+.list-container h2 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.filter-form {
+    margin-bottom: 20px;
+}
+
+.filter-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-row input,
+.filter-row select {
+    padding: 6px 10px;
+    border: 1px solid #cfd4da;
+    border-radius: 5px;
+}
+
 .btn-search {
     background-color: #4a6fa5;
     color: white;
+    padding: 7px 14px;
+    border-radius: 6px;
     border: none;
+    cursor: pointer;
 }
 
 .btn-search:hover {
     background-color: #3a5c8e;
 }
 
-/* Очистити */
-.btn-clear {
-    background-color: #b0b0b0;
+.list-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.list-table th,
+.list-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.list-table th {
+    background: #f5f7fa;
+    font-weight: 600;
+}
+
+.table-actions .btn-edit {
+    padding: 5px 12px;
+    background: #4a6fa5;
     color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 13px;
 }
 
-.btn-clear:hover {
-    background-color: #8c8c8c;
+.table-actions .btn-edit:hover {
+    background: #3a5c8e;
 }
 
+/* ============================================================
+   СТОРІНКА ФОРМИ КОРИСТУВАЧА
+   ============================================================ */
 
-/* === ВАШІ СТИЛІ (не змінював) === */
-
+/* --- Контейнер форми --- */
 .form-container {
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     padding: 25px 35px;
-    max-width: 800px;
+    max-width: 900px;
     margin: 20px auto;
 }
 
-/* ... (всі ваші стилі залишаються без змін) ... */
+/* --- Заголовки форми --- */
+.form-container h2 {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.form-container h3 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+/* --- Повідомлення про помилки --- */
+.form-error p {
+    color: red;
+    margin-bottom: 10px;
+}
+
+/* --- Ряди полів форми --- */
+.form-row {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 240px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 7px 10px;
+    border-radius: 5px;
+    border: 1px solid #cfd4da;
+    font-size: 13px;
+    transition: border 0.3s, box-shadow 0.3s;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #4a6fa5;
+    box-shadow: 0 0 4px rgba(74,111,165,0.3);
+    outline: none;
+}
+
+/* --- Чекбокс "Активний" --- */
+.checkbox-inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.checkbox-inline input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+}
+
+/* --- Кнопки форми (зберегти/скасувати) --- */
+.form-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn-cancel {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+    background: #b0b0b0;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-cancel:hover {
+    background-color: #8c8c8c;
+}
+
+/* --- Кнопки "Додати запис" у таблицях --- */
+#addAccessBtn,
+#addCertBtn,
+#addRoleBtn {
+    background-color: #4a6fa5;
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.2s, transform 0.2s;
+    margin-top: 10px;
+    margin-bottom: 12px;
+}
+
+#addAccessBtn:hover,
+#addCertBtn:hover,
+#addRoleBtn:hover {
+    background-color: #3a5c8e;
+    transform: translateY(-1px);
+}
+
+/* ============================================================
+   ТАБЛИЦІ У ФОРМІ КОРИСУВАЧА
+   ============================================================ */
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 12.5px;
+    margin-top: 12px;
+    background: #ffffff;
+    border: 1px solid #ddd;
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid #ddd;
+    padding: 2px 4px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 1.2;
+}
+
+.data-table th {
+    background-color: #f5f7fa;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.data-table select,
+.data-table input[type="text"],
+.data-table input[type="date"],
+.data-table input[type="checkbox"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 2px 4px;
+    border-radius: 4px;
+    border: 1px solid #cfd4da;
+    font-size: 12px;
+    background-color: #f9f9f9;
+    height: 24px;
+    text-align: center;
+    appearance: none;
+}
+
+/* --- Колонки таблиці доступів --- */
+#accessTable th:nth-child(1),
+#accessTable td:nth-child(1) {
+    width: 55%;
+}
+
+#accessTable th:nth-child(2),
+#accessTable td:nth-child(2) {
+    width: 35%;
+}
+
+#accessTable th:nth-child(3),
+#accessTable td:nth-child(3) {
+    width: 10%;
+}
+
+/* --- Колонки таблиці сертифікатів --- */
+#certTable th:nth-child(1),
+#certTable td:nth-child(1) { width: 30%; }
+
+#certTable th:nth-child(2),
+#certTable td:nth-child(2) { width: 25%; }
+
+#certTable th:nth-child(3),
+#certTable td:nth-child(3) { width: 25%; }
+
+#certTable th:nth-child(4),
+#certTable td:nth-child(4) { width: 10%; }
+
+#certTable th:nth-child(5),
+#certTable td:nth-child(5) { width: 10%; }
+
+/* --- Колонки таблиці ролей --- */
+#roleTable th:nth-child(1),
+#roleTable td:nth-child(1) { width: 85%; }
+
+#roleTable th:nth-child(2),
+#roleTable td:nth-child(2) { width: 15%; }
+
+/* --- Кнопка видалення рядка --- */
+.data-table .btn-delete {
+    background-color: #e53935;
+    color: #fff;
+    padding: 3px 6px;
+    font-size: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    height: 24px;
+}
+
+.data-table .btn-delete:hover {
+    background-color: #c62828;
+}
