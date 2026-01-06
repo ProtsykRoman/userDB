@@ -6,6 +6,7 @@
 <title layout:fragment="title"
 	th:text="${user.id == 0} ? 'Створити користувача' : 'Редагувати користувача'"></title>
 <link rel="stylesheet" th:href="@{/css/forms.css}">
+<link rel="icon" type="image/png" th:href="@{/favicon.png}">
 <script>
         function togglePasswordFields() {
             const checkbox = document.getElementById('changePassword');
