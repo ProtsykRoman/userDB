@@ -63,7 +63,7 @@ public class DBUserCertificateServiceImpl implements DBUserCertificateService{
 			updated.setDbUser(dbUserCertificate.getDbUser());
 			updated.setExpirationDate(dbUserCertificate.getExpirationDate());
 			updated.setNumber(dbUserCertificate.getNumber());
-			updated.setIsBlocked(dbUserCertificate.getIsBlocked());
+			updated.setBlocked(dbUserCertificate.getBlocked());
 			dbUserCertificateRepository.save(updated);
 			return Optional.of(updated);
 		}else {

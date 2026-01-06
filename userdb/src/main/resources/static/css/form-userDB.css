@@ -1,8 +1,4 @@
-/* ============================================================
-   ГЛОБАЛЬНІ СТИЛІ ДЛЯ СТОРІНОК СПИСКУ ТА ФОРМИ КОРИСТУВАЧІВ БД
-   ============================================================ */
 
-/* --- Базові кнопки --- */
 .btn-add,
 .btn-submit {
     background-color: #4a6fa5;
@@ -36,9 +32,6 @@
     background: #8c8c8c;
 }
 
-/* ============================================================
-   СТОРІНКА СПИСКУ КОРИСТУВАЧІВ
-   ============================================================ */
 
 .list-container {
     background: #fff;
@@ -115,11 +108,7 @@
     background: #3a5c8e;
 }
 
-/* ============================================================
-   СТОРІНКА ФОРМИ КОРИСТУВАЧА
-   ============================================================ */
 
-/* --- Контейнер форми --- */
 .form-container {
     background: #ffffff;
     border-radius: 10px;
@@ -129,7 +118,6 @@
     margin: 20px auto;
 }
 
-/* --- Заголовки форми --- */
 .form-container h2 {
     color: #2c3e50;
     margin-top: 0;
@@ -146,13 +134,11 @@
     font-size: 16px;
 }
 
-/* --- Повідомлення про помилки --- */
 .form-error p {
     color: red;
     margin-bottom: 10px;
 }
 
-/* --- Ряди полів форми --- */
 .form-row {
     display: flex;
     gap: 25px;
@@ -190,7 +176,6 @@
     outline: none;
 }
 
-/* --- Чекбокс "Активний" --- */
 .checkbox-inline {
     display: flex;
     align-items: center;
@@ -206,7 +191,6 @@
     margin: 0;
 }
 
-/* --- Кнопки форми (зберегти/скасувати) --- */
 .form-buttons {
     display: flex;
     justify-content: center;
@@ -230,7 +214,6 @@
     background-color: #8c8c8c;
 }
 
-/* --- Кнопки "Додати запис" у таблицях --- */
 #addAccessBtn,
 #addCertBtn,
 #addRoleBtn {
@@ -254,9 +237,6 @@
     transform: translateY(-1px);
 }
 
-/* ============================================================
-   ТАБЛИЦІ У ФОРМІ КОРИСУВАЧА
-   ============================================================ */
 
 .data-table {
     width: 100%;
@@ -285,8 +265,7 @@
 
 .data-table select,
 .data-table input[type="text"],
-.data-table input[type="date"],
-.data-table input[type="checkbox"] {
+.data-table input[type="date"] {
     width: 100%;
     box-sizing: border-box;
     padding: 2px 4px;
@@ -296,10 +275,21 @@
     background-color: #f9f9f9;
     height: 24px;
     text-align: center;
-    appearance: none;
 }
 
-/* --- Колонки таблиці доступів --- */
+.data-table input[type="checkbox"] {
+    width: auto;
+    height: auto;
+    appearance: checkbox;
+    -webkit-appearance: checkbox;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0 auto;
+    cursor: pointer;
+}
+
+
 #accessTable th:nth-child(1),
 #accessTable td:nth-child(1) {
     width: 55%;
@@ -315,7 +305,7 @@
     width: 10%;
 }
 
-/* --- Колонки таблиці сертифікатів --- */
+
 #certTable th:nth-child(1),
 #certTable td:nth-child(1) { width: 30%; }
 
@@ -331,14 +321,14 @@
 #certTable th:nth-child(5),
 #certTable td:nth-child(5) { width: 10%; }
 
-/* --- Колонки таблиці ролей --- */
+
 #roleTable th:nth-child(1),
 #roleTable td:nth-child(1) { width: 85%; }
 
 #roleTable th:nth-child(2),
 #roleTable td:nth-child(2) { width: 15%; }
 
-/* --- Кнопка видалення рядка --- */
+
 .data-table .btn-delete {
     background-color: #e53935;
     color: #fff;
@@ -353,4 +343,21 @@
 
 .data-table .btn-delete:hover {
     background-color: #c62828;
+}
+
+.table-header {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;        
+    margin-bottom: 10px;
+}
+
+.table-header h3 {
+    margin: 0;
+}
+
+.table-header .btn-add {
+    margin-left: 10px;  
+    padding: 4px 12px;  
+    font-size: 0.9em;
 }

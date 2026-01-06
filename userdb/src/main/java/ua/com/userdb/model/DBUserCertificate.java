@@ -41,5 +41,5 @@ public class DBUserCertificate {
 	@Column(name="number")
 	private String number;
 	@Column(name="is_blocked")
-	private Boolean isBlocked;
+	private Boolean blocked = false;
 }

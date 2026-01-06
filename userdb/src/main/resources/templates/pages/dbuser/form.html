@@ -67,9 +67,10 @@
 			</div>
 
 			<!-- Таблиця сертифікатів -->
-			<h3>Сертифікати користувача</h3>
-			<button type="button" class="btn-add" id="addCertBtn">Додати
-				сертифікат</button>
+			<div class="table-header">
+    <h3>Сертифікати користувача</h3>
+    <button type="button" class="btn-add" id="addCertBtn">Додати</button>
+</div>
 			<table id="certTable" class="data-table">
 				<thead>
 					<tr>
@@ -96,7 +97,9 @@
 						<td><input type="date"
 							th:field="*{dbUserCertificates[__${iStat.index}__].expirationDate}" /></td>
 						<td><input type="checkbox"
-							th:field="*{dbUserCertificates[__${iStat.index}__].isBlocked}" /></td>
+							th:field="*{dbUserCertificates[__${iStat.index}__].blocked}" />
+						</td>
+
 						<td class="action-cell">
 							<button type="button" class="btn-delete"
 								onclick="removeCertRow(this)">Видалити</button>
@@ -106,9 +109,10 @@
 			</table>
 
 			<!-- Таблиця доступів -->
-			<h3>Доступи до баз даних</h3>
-			<button type="button" class="btn-add" id="addAccessBtn">Додати
-				доступ</button>
+			<div class="table-header">
+    <h3>Доступи до баз даних</h3>
+    <button type="button" class="btn-add" id="addAccessBtn">Додати</button>
+</div>
 			<table id="accessTable" class="data-table">
 				<thead>
 					<tr>
@@ -139,9 +143,10 @@
 			</table>
 
 			<!-- Таблиця ролей -->
-			<h3>Ролі користувача</h3>
-			<button type="button" class="btn-add" id="addRoleBtn">Додати
-				роль</button>
+			<div class="table-header">
+    <h3>Ролі користувача</h3>
+    <button type="button" class="btn-add" id="addRoleBtn">Додати</button>
+</div>
 			<table id="roleTable" class="data-table">
 				<thead>
 					<tr>
