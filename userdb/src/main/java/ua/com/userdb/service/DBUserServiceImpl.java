@@ -97,6 +97,11 @@ public class DBUserServiceImpl implements DBUserService {
 			return false;
 		}
 	}
+	
+	@Override
+	public boolean existsByIdentificationNumber(Integer identificationNumber) {
+	    return dbUserRepository.existsByIdentificationNumber(identificationNumber);
+	}
 
 	/** Встановлює зворотні посилання на DBUser у дочірніх колекціях */
 	private void setBackReferences(DBUser dbUser) {

@@ -137,13 +137,44 @@ public class DBUserController {
     }
 
     @PostMapping
-    public String createDBUser(@ModelAttribute DBUser dbUser) {
-        dbUserService.createDBUser(dbUser);
-        return "redirect:/dbusers";
+    public String createDBUser(@ModelAttribute DBUser dbUser, Model model) throws JsonProcessingException  {
+    	if (dbUser.getIdentificationNumber() != null &&
+    	        dbUserService.existsByIdentificationNumber(dbUser.getIdentificationNumber())) {
+
+    	        model.addAttribute("error",
+    	                "Користувач з таким ідентифікаційним номером вже існує");
+
+    	        model.addAttribute("dbUser", dbUser);
+    	        addFormAttributes(model, dbUser);
+    	        return "pages/dbuser/form";
+    	    }
+
+    	    dbUserService.createDBUser(dbUser);
+    	    return "redirect:/dbusers";
     }
 
     @PostMapping("/update/{id}")
-    public String updateDBUser(@PathVariable Integer id, @ModelAttribute DBUser dbUser) {
+    public String updateDBUser(@PathVariable Integer id, @ModelAttribute DBUser dbUser,
+    							Model model) throws JsonProcessingException {
+    	Optional<DBUser> existing = dbUserService.findById(id);
+
+        if (existing.isPresent()) {
+            Integer oldNumber = existing.get().getIdentificationNumber();
+            Integer newNumber = dbUser.getIdentificationNumber();
+
+            if (newNumber != null &&
+                !Objects.equals(oldNumber, newNumber) &&
+                dbUserService.existsByIdentificationNumber(newNumber)) {
+
+            	model.addAttribute("dbUser", dbUser);
+                model.addAttribute("error",
+                        "Інший користувач вже має такий ідентифікаційний номер");
+
+                addFormAttributes(model, dbUser);
+                return "pages/dbuser/form";
+            }
+        }
+
         dbUserService.updateDBUser(id, dbUser);
         return "redirect:/dbusers";
     }

@@ -9,9 +9,10 @@ public interface DBUserService {
     Optional<DBUser> findById(Integer id);
     Optional<DBUser> findByName(String name);
 
-    // Тепер update повертає DBUser замість Optional
     DBUser createDBUser(DBUser dbUser);
     DBUser updateDBUser(Integer id, DBUser dbUser);
 
     boolean deleteDBUser(Integer id);
+    
+    boolean existsByIdentificationNumber(Integer identificationNumber);
 }
