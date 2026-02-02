@@ -26,13 +26,12 @@ public class ReportsServiceImpl implements ReportsService {
     public List<ReportRowDto> getReport(ReportFilter filter) {
 
         List<ReportRowDto> result = new ArrayList<>();
-
         boolean hasDate = filter.getExpirationTo() != null;
 
-        if (filter.getCertificateTypeId() != null ||
-            (filter.getDatabaseId() == null && filter.getDatabaseRoleId() == null)) {
+        // ================= CERTIFICATES =================
+        if (filter.getCertificateTypeId() != null) {
 
-            var certs = hasDate
+            var rows = hasDate
                 ? reportsRepository.findCertificatesWithDate(
                         filter.getDepartmentId(),
                         filter.getCertificateTypeId(),
@@ -41,12 +40,14 @@ public class ReportsServiceImpl implements ReportsService {
                         filter.getDepartmentId(),
                         filter.getCertificateTypeId());
 
-            certs.forEach(c ->
-                result.add(new ReportRowDto(c, ReportSourceType.CERTIFICATE))
+            rows.forEach(r ->
+                result.add(new ReportRowDto(r, ReportSourceType.CERTIFICATE))
             );
+
+            return sort(result);
         }
 
-        // ===== ДОСТУП ПО РОЛІ =====
+        // ================= ACCESS BY ROLE =================
         if (filter.getDatabaseRoleId() != null) {
 
             var rows = hasDate
@@ -61,10 +62,12 @@ public class ReportsServiceImpl implements ReportsService {
             rows.forEach(r ->
                 result.add(new ReportRowDto(r, ReportSourceType.ACCESS))
             );
+
+            return sort(result);
         }
 
-        // ===== ДОСТУП ПО БД =====
-        else if (filter.getDatabaseId() != null) {
+        // ================= ACCESS BY DATABASE =================
+        if (filter.getDatabaseId() != null) {
 
             var rows = hasDate
                 ? reportsRepository.findAccessesByDatabaseWithDate(
@@ -78,15 +81,34 @@ public class ReportsServiceImpl implements ReportsService {
             rows.forEach(r ->
                 result.add(new ReportRowDto(r, ReportSourceType.ACCESS))
             );
+
+            return sort(result);
         }
 
-        result.sort(Comparator.comparing(
+        // ================= DEFAULT: CERTIFICATES =================
+        var rows = hasDate
+            ? reportsRepository.findCertificatesWithDate(
+                    filter.getDepartmentId(),
+                    null,
+                    filter.getExpirationTo())
+            : reportsRepository.findCertificatesNoDate(
+                    filter.getDepartmentId(),
+                    null);
+
+        rows.forEach(r ->
+            result.add(new ReportRowDto(r, ReportSourceType.CERTIFICATE))
+        );
+
+        return sort(result);
+    }
+
+    private List<ReportRowDto> sort(List<ReportRowDto> list) {
+        list.sort(Comparator.comparing(
             ReportRowDto::getExpirationDate,
             Comparator.nullsLast(Comparator.naturalOrder())
         ));
-
-        return result;
+        return list;
     }
-
 }
+
 

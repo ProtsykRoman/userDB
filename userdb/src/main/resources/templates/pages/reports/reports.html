@@ -113,7 +113,16 @@ select:disabled {
 
 			<div class="form-buttons">
 				<button type="submit" class="btn-add">Показати</button>
-				<a th:href="@{/reports}" class="btn-cancel">Очистити</a>
+				<a th:href="@{/reports}" class="btn-cancel">Очистити</a> <a
+					class="btn-export-excel"
+					th:href="@{/reports/export(
+       departmentId=${departmentId},
+       databaseId=${databaseId},
+       databaseRoleId=${databaseRoleId},
+       certificateTypeId=${certificateTypeId},
+       expirationTo=${expirationTo}
+   )}">
+					Експорт в Excel </a>
 			</div>
 
 		</form>

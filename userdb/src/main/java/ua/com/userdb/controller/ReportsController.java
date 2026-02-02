@@ -1,5 +1,6 @@
 package ua.com.userdb.controller;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpServletResponse;
 import ua.com.userdb.dto.ReportFilter;
 import ua.com.userdb.dto.ReportRowDto;
 import ua.com.userdb.service.CertificateTypeService;
@@ -18,6 +20,7 @@ import ua.com.userdb.service.DatabaseRoleService;
 import ua.com.userdb.service.DatabaseService;
 import ua.com.userdb.service.DepartmentService;
 import ua.com.userdb.service.ReportsService;
+import ua.com.userdb.util.ReportExcelWriter;
 
 @Controller
 @RequestMapping("/reports")
@@ -116,6 +119,51 @@ public class ReportsController {
         System.out.println("expirationTo=" + expirationTo);
 
         return "pages/reports/reports";
+    }
+    
+    @GetMapping("/export")
+    public void exportToExcel(
+            @RequestParam(required = false) Integer departmentId,
+            @RequestParam(required = false) Integer databaseId,
+            @RequestParam(required = false) Integer databaseRoleId,
+            @RequestParam(required = false) Integer certificateTypeId,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationTo,
+            HttpServletResponse response
+    ) throws IOException {
+
+        // нормалізація (як у reports)
+        if (databaseRoleId != null) {
+            databaseId = null;
+            certificateTypeId = null;
+        } else if (databaseId != null) {
+            certificateTypeId = null;
+        }
+
+        ReportFilter filter = new ReportFilter();
+        filter.setDepartmentId(departmentId);
+        filter.setDatabaseId(databaseId);
+        filter.setDatabaseRoleId(databaseRoleId);
+        filter.setCertificateTypeId(certificateTypeId);
+        filter.setExpirationTo(expirationTo);
+
+        List<ReportRowDto> report = reportsService.getReport(filter);
+
+        response.setContentType(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        response.setHeader(
+            "Content-Disposition",
+            "attachment; filename=report.xlsx"
+        );
+
+        // ===== ВИКЛИК ЗАЛЕЖНО ВІД ТИПУ =====
+        if (certificateTypeId != null) {
+            ReportExcelWriter.writeCertificates(report, response.getOutputStream());
+        } else {
+            // доступ по базі або ролі
+            ReportExcelWriter.writeAccesses(report, response.getOutputStream());
+        }
     }
 
 

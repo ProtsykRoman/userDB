@@ -361,3 +361,21 @@
     padding: 4px 12px;  
     font-size: 0.9em;
 }
+
+.btn-export-excel {
+    background-color: #28a745; 
+    color: #ffffff !important;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none; 
+    display: inline-block; 
+}
+
+.btn-export-excel:hover {
+    background-color: #218838; 
+    color: #ffffff !important; 
+}
