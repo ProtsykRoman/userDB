@@ -1,42 +1,58 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
 <head>
-    <title layout:fragment="title">Типи сертифікатів</title>
-    <link rel="stylesheet" th:href="@{/css/lists.css}">
-    <link rel="icon" type="image/png" th:href="@{/favicon.png}">
+<title layout:fragment="title">Типи сертифікатів</title>
+<link rel="stylesheet" th:href="@{/css/lists.css}">
+<link rel="icon" type="image/png" th:href="@{/favicon.png}">
 </head>
 <body>
-<div layout:fragment="content" class="list-container">
+	<div layout:fragment="content" class="list-container">
 
-    <h2>Список типів сертифікатів</h2>
+		<h2>Список типів сертифікатів</h2>
 
-    <!-- Кнопка для додавання нового сертифіката -->
-    <a class="btn-add" th:href="@{/certificate-types/new}">+ Додати новий сертифікат</a>
+		<!-- Кнопка для додавання нового сертифіката -->
+		<a class="btn-add" th:href="@{/certificate-types/new}">+ Додати
+			новий сертифікат</a>
 
-    <!-- Таблиця -->
-    <table class="list-table">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Назва</th>
-            <th>Активний</th>
-            <th>Дії</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="certificateType : ${certificateTypes}">
-            <td th:text="${certificateType.id}"></td>
-            <td th:text="${certificateType.name}"></td>
-            <td th:text="${certificateType.isActive} ? 'Так' : 'Ні'"></td>
-            <td class="table-actions">
-                <a th:href="@{'/certificate-types/edit/' + ${certificateType.id}}" class="btn-edit">Редагувати</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+		<!-- Таблиця -->
+		<table class="list-table">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Назва</th>
+					<th>Активний</th>
+					<th>Дії</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="certificateType : ${certificateTypes}">
+					<td th:text="${certificateType.id}"></td>
+					<td th:text="${certificateType.name}"></td>
+					<td th:text="${certificateType.isActive} ? 'Так' : 'Ні'"></td>
+					<td class="table-actions"><a
+						th:href="@{'/certificate-types/edit/' + ${certificateType.id}}"
+						class="btn-edit">Редагувати</a></td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="pagination">
+			<span
+				th:text="'Записи ' + (${currentPage}-1)*${pageSize}+1 + ' - ' +
+        ((${currentPage}-1)*${pageSize} + ${certificateTypes.size()}) +
+        ' з ' + ${totalRecords}">
+			</span>
 
-</div>
+			<div class="pagination-buttons">
+				<a th:if="${currentPage > 1}"
+					th:href="@{/certificate-types(page=${currentPage - 1}, size=${pageSize})}">
+					&laquo; Назад </a> <a th:if="${currentPage < totalPages}"
+					th:href="@{/certificate-types(page=${currentPage + 1}, size=${pageSize})}">
+					Вперед &raquo; </a>
+			</div>
+		</div>
+
+	</div>
 </body>
 </html>

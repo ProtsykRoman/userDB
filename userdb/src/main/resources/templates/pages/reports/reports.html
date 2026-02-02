@@ -162,7 +162,22 @@ select:disabled {
 					</tr>
 				</tbody>
 			</table>
+
+			<div class="pagination">
+				<span
+					th:text="'Записи ' + (${currentPage}-1)*${pageSize}+1 + ' - ' + (${currentPage}-1)*${pageSize} + ${report.size()} + ' з ' + ${totalRecords}"></span>
+
+				<div class="pagination-buttons">
+					<a th:if="${currentPage > 1}"
+						th:href="@{/reports(departmentId=${departmentId}, databaseId=${databaseId}, databaseRoleId=${databaseRoleId}, certificateTypeId=${certificateTypeId}, expirationTo=${expirationTo}, page=${currentPage - 1}, size=${pageSize})}">&laquo;
+						Назад</a> <a th:if="${currentPage < totalPages}"
+						th:href="@{/reports(departmentId=${departmentId}, databaseId=${databaseId}, databaseRoleId=${databaseRoleId}, certificateTypeId=${certificateTypeId}, expirationTo=${expirationTo}, page=${currentPage + 1}, size=${pageSize})}">Вперед
+						&raquo;</a>
+				</div>
+			</div>
 		</div>
+
+
 
 	</div>
 </body>

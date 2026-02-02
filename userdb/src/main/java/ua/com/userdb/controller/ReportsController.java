@@ -54,6 +54,8 @@ public class ReportsController {
             @RequestParam(required = false) Integer certificateTypeId,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationTo,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size,
             Model model
     ) {
 
@@ -107,16 +109,20 @@ public class ReportsController {
             filter.setCertificateTypeId(certificateTypeId);
             filter.setExpirationTo(expirationTo);
 
-            List<ReportRowDto> report = reportsService.getReport(filter);
-            model.addAttribute("report", report);
+            List<ReportRowDto> fullReport = reportsService.getReport(filter);
+            
+            int totalRecords = fullReport.size();
+            int totalPages = (int) Math.ceil((double) totalRecords / size);
+            
+            int fromIndex = Math.min((page - 1) * size, totalRecords);
+            int toIndex = Math.min(fromIndex + size, totalRecords);
+            List<ReportRowDto> reportPage = fullReport.subList(fromIndex, toIndex);
+            model.addAttribute("report", reportPage);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("pageSize", size);
+            model.addAttribute("totalRecords", totalRecords);
+            model.addAttribute("totalPages", totalPages);
         }
-
-
-        System.out.println("departmentId=" + departmentId);
-        System.out.println("databaseId=" + databaseId);
-        System.out.println("databaseRoleId=" + databaseRoleId);
-        System.out.println("certificateTypeId=" + certificateTypeId);
-        System.out.println("expirationTo=" + expirationTo);
 
         return "pages/reports/reports";
     }

@@ -20,23 +20,43 @@ public class RankController {
         this.rankService = rankService;
     }
 
-    // 🧾 Список усіх рангів
+    
     @GetMapping
-    public String listRanks(Model model) {
+    public String listRanks(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size,
+            Model model
+    ) {
         List<Rank> ranks = rankService.findAll();
-        model.addAttribute("ranks", ranks);
+
+        // пагінація
+        int totalRecords = ranks.size();
+        int totalPages = (int) Math.ceil((double) totalRecords / size);
+
+        int fromIndex = Math.min((page - 1) * size, totalRecords);
+        int toIndex = Math.min(fromIndex + size, totalRecords);
+
+        List<Rank> pageList = ranks.subList(fromIndex, toIndex);
+
+        model.addAttribute("ranks", pageList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("totalRecords", totalRecords);
+        model.addAttribute("totalPages", totalPages);
         model.addAttribute("activePage", "ranks");
-        return "pages/ranks/list"; // -> templates/ranks/list.html
+
+        return "pages/ranks/list";
     }
 
-    // 🆕 Форма створення нового
+
+   
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("rank", new Rank());
         return "pages/ranks/form"; // єдина форма
     }
 
-    // ✏️ Форма редагування
+    
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Integer id, Model model) {
         Optional<Rank> rank = rankService.findRankById(id);
@@ -48,21 +68,21 @@ public class RankController {
         }
     }
 
-    // 💾 Створити новий
+
     @PostMapping
     public String createRank(@ModelAttribute Rank rank) {
         rankService.createRank(rank);
         return "redirect:/ranks";
     }
 
-    // ♻️ Оновити існуючий
+
     @PostMapping("/update/{id}")
     public String updateRank(@PathVariable Integer id, @ModelAttribute Rank rank) {
         rankService.updateRank(id, rank);
         return "redirect:/ranks";
     }
 
-    // 🗑️ Видалити
+
     @GetMapping("/delete/{id}")
     public String deleteRank(@PathVariable Integer id) {
         rankService.deleteRank(id);

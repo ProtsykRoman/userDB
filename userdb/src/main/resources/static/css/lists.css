@@ -96,3 +96,26 @@
     background-color: #c62828; /* темніший червоний */
     color: #ffffff;
 }
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    font-size: 13px;
+}
+
+.pagination-buttons a {
+    display: inline-block;
+    padding: 4px 10px;
+    margin-left: 5px;
+    background-color: #4a6fa5;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.pagination-buttons a:hover {
+    background-color: #3a5c8e;
+}

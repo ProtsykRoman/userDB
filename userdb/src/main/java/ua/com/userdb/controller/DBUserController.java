@@ -57,39 +57,37 @@ public class DBUserController {
             @RequestParam(required = false) String department,
             @RequestParam(required = false) String identificationNumber,
             @RequestParam(required = false) String isActive,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size,
             Model model
     ) {
         List<DBUser> users = dbUserService.findAll();
 
+        // --- фільтри ---
         if (name != null && !name.isEmpty()) {
             users = users.stream()
                     .filter(u -> u.getName() != null &&
                             u.getName().toLowerCase().contains(name.toLowerCase()))
                     .collect(Collectors.toList());
         }
-
         if (rank != null && !rank.isEmpty()) {
             users = users.stream()
                     .filter(u -> u.getRank() != null &&
                             u.getRank().getName().toLowerCase().contains(rank.toLowerCase()))
                     .collect(Collectors.toList());
         }
-
         if (department != null && !department.isEmpty()) {
             users = users.stream()
                     .filter(u -> u.getDepartment() != null &&
                             u.getDepartment().getName().toLowerCase().contains(department.toLowerCase()))
                     .collect(Collectors.toList());
         }
-
         if (identificationNumber != null && !identificationNumber.isEmpty()) {
             users = users.stream()
                     .filter(u -> u.getIdentificationNumber() != null &&
-                            String.valueOf(u.getIdentificationNumber())
-                                    .contains(identificationNumber))
+                            String.valueOf(u.getIdentificationNumber()).contains(identificationNumber))
                     .collect(Collectors.toList());
         }
-
         if (isActive != null && !isActive.isEmpty()) {
             boolean active = Boolean.parseBoolean(isActive);
             users = users.stream()
@@ -97,11 +95,25 @@ public class DBUserController {
                     .collect(Collectors.toList());
         }
 
-        model.addAttribute("dbUsers", users);
+        // --- пагінація ---
+        int totalRecords = users.size();
+        int totalPages = (int) Math.ceil((double) totalRecords / size);
+
+        int fromIndex = Math.min((page - 1) * size, totalRecords);
+        int toIndex = Math.min(fromIndex + size, totalRecords);
+
+        List<DBUser> pageList = users.subList(fromIndex, toIndex);
+
+        model.addAttribute("dbUsers", pageList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("totalRecords", totalRecords);
+        model.addAttribute("totalPages", totalPages);
         model.addAttribute("activePage", "dbUsers");
 
         return "pages/dbuser/list";
     }
+
 
     @GetMapping("/new")
     public String showCreateForm(Model model) throws JsonProcessingException {

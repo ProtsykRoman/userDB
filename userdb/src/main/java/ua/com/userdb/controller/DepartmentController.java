@@ -20,12 +20,31 @@ public class DepartmentController {
     }
 
     @GetMapping
-    public String listDepartments(Model model) {
-        List<Department> departments = departmentService.findAll();
-        model.addAttribute("departments", departments);
+    public String listDepartments(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size,
+            Model model
+    ) {
+        List<Department> all = departmentService.getDepartmentsHierarchy(); // щоб враховувати ієрархію
+
+        int totalRecords = all.size();
+        int totalPages = (int) Math.ceil((double) totalRecords / size);
+
+        int fromIndex = Math.min((page - 1) * size, totalRecords);
+        int toIndex = Math.min(fromIndex + size, totalRecords);
+
+        List<Department> pageList = all.subList(fromIndex, toIndex);
+
+        model.addAttribute("departments", pageList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("totalRecords", totalRecords);
+        model.addAttribute("totalPages", totalPages);
         model.addAttribute("activePage", "departments");
+
         return "pages/departments/list";
     }
+
 
     @GetMapping("/new")
     public String showForm(Model model) {

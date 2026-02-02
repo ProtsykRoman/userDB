@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import ua.com.userdb.model.CertificateType;
 import ua.com.userdb.service.CertificateTypeService;
@@ -22,12 +23,32 @@ public class CertificateTypeController {
 		this.certificateTypeService = certificateTypeService;
 	}
 	
-    @GetMapping
-    public String certificateTypes(Model model) {
-    	model.addAttribute("certificateTypes", certificateTypeService.findAllCertificateType());
-    	model.addAttribute("activePage", "certificate-types");
-        return "pages/certificateTypes/list";
-    }
+	@GetMapping
+	public String certificateTypes(
+	        @RequestParam(defaultValue = "1") int page,
+	        @RequestParam(defaultValue = "20") int size,
+	        Model model
+	) {
+	    var all = certificateTypeService.findAllCertificateType();
+
+	    int totalRecords = all.size();
+	    int totalPages = (int) Math.ceil((double) totalRecords / size);
+
+	    int fromIndex = Math.min((page - 1) * size, totalRecords);
+	    int toIndex = Math.min(fromIndex + size, totalRecords);
+
+	    var pageList = all.subList(fromIndex, toIndex);
+
+	    model.addAttribute("certificateTypes", pageList);
+	    model.addAttribute("currentPage", page);
+	    model.addAttribute("pageSize", size);
+	    model.addAttribute("totalRecords", totalRecords);
+	    model.addAttribute("totalPages", totalPages);
+	    model.addAttribute("activePage", "certificate-types");
+
+	    return "pages/certificateTypes/list";
+	}
+
 	
     @GetMapping("/new")
     public String showCreateForm(Model model) {

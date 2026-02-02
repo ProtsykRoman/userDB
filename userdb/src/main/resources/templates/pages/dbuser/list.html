@@ -1,102 +1,110 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
 <head>
-    <title layout:fragment="title">Список користувачів баз данних</title>
-    <link rel="stylesheet" th:href="@{/css/lists.css}">
-    <link rel="icon" type="image/png" th:href="@{/favicon.png}">
+<title layout:fragment="title">Список користувачів баз данних</title>
+<link rel="stylesheet" th:href="@{/css/lists.css}">
+<link rel="icon" type="image/png" th:href="@{/favicon.png}">
 </head>
 <body>
-<div layout:fragment="content" class="list-container">
+	<div layout:fragment="content" class="list-container">
 
-    <h2>Список користувачів баз данних</h2>
+		<h2>Список користувачів баз данних</h2>
 
-    <a class="btn-add" th:href="@{/dbusers/new}">+ Додати нового користувача</a>
+		<a class="btn-add" th:href="@{/dbusers/new}">+ Додати нового
+			користувача</a>
 
-    <!-- Фільтр прямо в таблиці -->
-    <form th:action="@{/dbusers}" method="get">
-        <table class="list-table">
-            <thead>
+		<!-- Фільтр прямо в таблиці -->
+		<form th:action="@{/dbusers}" method="get">
+			<table class="list-table">
+				<thead>
 
-            <!-- Заголовки -->
-            <tr>
-                <th>ID</th>
-                <th>ПІБ</th>
-                <th>Звання</th>
-                <th>Підрозділ</th>
-                <th>Ідентифікаційний номер</th>
-                <th>Активний</th>
-                <th>Дії</th>
-            </tr>
+					<!-- Заголовки -->
+					<tr>
+						<th>ID</th>
+						<th>ПІБ</th>
+						<th>Звання</th>
+						<th>Підрозділ</th>
+						<th>Ідентифікаційний номер</th>
+						<th>Активний</th>
+						<th>Дії</th>
+					</tr>
 
-            <!-- Ряд фільтрів -->
-            <tr class="filter-row">
-                <td></td>
+					<!-- Ряд фільтрів -->
+					<tr class="filter-row">
+						<td></td>
 
-                <!-- ПІБ -->
-                <td>
-                    <input type="text" name="name" placeholder="Пошук..."
-                           th:value="${param.name}">
-                </td>
+						<!-- ПІБ -->
+						<td><input type="text" name="name" placeholder="Пошук..."
+							th:value="${param.name}"></td>
 
-                <!-- Звання -->
-                <td>
-                    <input type="text" name="rank" placeholder="Пошук..."
-                           th:value="${param.rank}">
-                </td>
+						<!-- Звання -->
+						<td><input type="text" name="rank" placeholder="Пошук..."
+							th:value="${param.rank}"></td>
 
-                <!-- Підрозділ -->
-                <td>
-                    <input type="text" name="department" placeholder="Пошук..."
-                           th:value="${param.department}">
-                </td>
+						<!-- Підрозділ -->
+						<td><input type="text" name="department"
+							placeholder="Пошук..." th:value="${param.department}"></td>
 
-                <!-- Ідентифікаційний -->
-                <td>
-                    <input type="text" name="identificationNumber" placeholder="Пошук..."
-                           th:value="${param.identificationNumber}">
-                </td>
+						<!-- Ідентифікаційний -->
+						<td><input type="text" name="identificationNumber"
+							placeholder="Пошук..." th:value="${param.identificationNumber}">
+						</td>
 
-                <!-- Активний -->
-                <td>
-                    <select name="isActive">
-                        <option value="">(всі)</option>
-                        <option value="true" th:selected="${param.isActive == 'true'}">Так</option>
-                        <option value="false" th:selected="${param.isActive == 'false'}">Ні</option>
-                    </select>
-                </td>
+						<!-- Активний -->
+						<td><select name="isActive">
+								<option value="">(всі)</option>
+								<option value="true" th:selected="${param.isActive == 'true'}">Так</option>
+								<option value="false" th:selected="${param.isActive == 'false'}">Ні</option>
+						</select></td>
 
-                <!-- Дії -->
-                <td class="filter-actions">
-                    <button type="submit" class="btn-search">🔍</button>
-                    <a th:href="@{/dbusers}" class="btn-clear">✖</a>
-                </td>
-            </tr>
+						<!-- Дії -->
+						<td class="filter-actions">
+							<button type="submit" class="btn-search">🔍</button> <a
+							th:href="@{/dbusers}" class="btn-clear">✖</a>
+						</td>
+					</tr>
 
-            </thead>
+				</thead>
 
-            <tbody>
-            <tr th:each="user : ${dbUsers}">
-                <td th:text="${user.id}"></td>
-                <td th:text="${user.name}"></td>
-                <td th:text="${user.rank?.name}"></td>
+				<tbody>
+					<tr th:each="user : ${dbUsers}">
+						<td th:text="${user.id}"></td>
+						<td th:text="${user.name}"></td>
+						<td th:text="${user.rank?.name}"></td>
 
-                <td th:text="${user.department != null ? '--'.repeat(user.department.level) + user.department.name : ''}"></td>
+						<td
+							th:text="${user.department != null ? '--'.repeat(user.department.level) + user.department.name : ''}"></td>
 
-                <td th:text="${user.identificationNumber}"></td>
+						<td th:text="${user.identificationNumber}"></td>
 
-                <td th:text="${user.isActive} ? 'Так' : 'Ні'"></td>
+						<td th:text="${user.isActive} ? 'Так' : 'Ні'"></td>
 
-                <td class="table-actions">
-                    <a th:href="@{/dbusers/edit/{id}(id=${user.id})}" class="btn-edit">Редагувати</a>
-                </td>
-            </tr>
-            </tbody>
+						<td class="table-actions"><a
+							th:href="@{/dbusers/edit/{id}(id=${user.id})}" class="btn-edit">Редагувати</a>
+						</td>
+					</tr>
+				</tbody>
 
-        </table>
-    </form>
+			</table>
+			<div class="pagination">
+				<span
+					th:text="'Записи ' + (${currentPage}-1)*${pageSize}+1 + ' - ' +
+        ((${currentPage}-1)*${pageSize} + ${dbUsers.size()}) +
+        ' з ' + ${totalRecords}">
+				</span>
 
-</div>
+				<div class="pagination-buttons">
+					<a th:if="${currentPage > 1}"
+						th:href="@{/dbusers(page=${currentPage - 1}, size=${pageSize}, name=${param.name}, rank=${param.rank}, department=${param.department}, identificationNumber=${param.identificationNumber}, isActive=${param.isActive})}">
+						&laquo; Назад </a> <a th:if="${currentPage < totalPages}"
+						th:href="@{/dbusers(page=${currentPage + 1}, size=${pageSize}, name=${param.name}, rank=${param.rank}, department=${param.department}, identificationNumber=${param.identificationNumber}, isActive=${param.isActive})}">
+						Вперед &raquo; </a>
+				</div>
+			</div>
+		</form>
+
+	</div>
 </body>
 </html>

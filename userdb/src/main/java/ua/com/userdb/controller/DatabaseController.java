@@ -19,9 +19,28 @@ public class DatabaseController {
     }
 
     @GetMapping
-    public String databases(Model model) {
-        model.addAttribute("databases", databaseService.findAllDatabase());
+    public String databases(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size,
+            Model model
+    ) {
+        var all = databaseService.findAllDatabase();
+
+        int totalRecords = all.size();
+        int totalPages = (int) Math.ceil((double) totalRecords / size);
+
+        int fromIndex = Math.min((page - 1) * size, totalRecords);
+        int toIndex = Math.min(fromIndex + size, totalRecords);
+
+        var pageList = all.subList(fromIndex, toIndex);
+
+        model.addAttribute("databases", pageList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("totalRecords", totalRecords);
+        model.addAttribute("totalPages", totalPages);
         model.addAttribute("activePage", "databases");
+
         return "pages/databases/list";
     }
 
