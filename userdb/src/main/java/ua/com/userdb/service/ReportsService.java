@@ -1,17 +1,10 @@
 package ua.com.userdb.service;
 
-import java.util.Date;
 import java.util.List;
 
-import ua.com.userdb.model.DBUser;
+import ua.com.userdb.dto.ReportFilter;
+import ua.com.userdb.dto.ReportRowDto;
 
 public interface ReportsService {
-	List<DBUser> getReport(
-            String reportType,
-            Long databaseId,
-            Long roleId,
-            Long certificateTypeId,
-            Long departmentId,
-            Date expirationBefore
-    );
+	List<ReportRowDto> getReport(ReportFilter filter);
 }

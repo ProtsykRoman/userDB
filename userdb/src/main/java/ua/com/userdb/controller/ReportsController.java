@@ -4,106 +4,119 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import ua.com.userdb.model.DBUser;
+import ua.com.userdb.dto.ReportFilter;
+import ua.com.userdb.dto.ReportRowDto;
 import ua.com.userdb.service.CertificateTypeService;
-import ua.com.userdb.service.DBUserService;
 import ua.com.userdb.service.DatabaseRoleService;
 import ua.com.userdb.service.DatabaseService;
 import ua.com.userdb.service.DepartmentService;
 import ua.com.userdb.service.ReportsService;
 
 @Controller
-@RequestMapping
+@RequestMapping("/reports")
 public class ReportsController {
-	
-	private DatabaseService databaseService;
-	private DatabaseRoleService databaseRoleService;
-	private CertificateTypeService certificateTypeService;
-	private DepartmentService departmentService;
-	private ReportsService reportsService;
-	private DBUserService dbUserService;
-	
-	public ReportsController(DatabaseService databaseService, DatabaseRoleService databaseRoleService,
-			CertificateTypeService certificateTypeService, DepartmentService departmentService
-			, ReportsService reportsService, DBUserService dbUserService) {
-		this.databaseService = databaseService;
-		this.databaseRoleService = databaseRoleService;
-		this.certificateTypeService = certificateTypeService;
-		this.departmentService = departmentService;
-		this.reportsService = reportsService;
-		this.dbUserService = dbUserService;
-	}
-	
 
-	@GetMapping("/reports")
-	public String reports(
-	        @RequestParam(required = false) Long databaseId,
-	        @RequestParam(required = false) Long roleId,
-	        @RequestParam(required = false) Long certificateTypeId,
-	        @RequestParam(required = false) Long departmentId,
-	        @RequestParam(required = false) String expFrom,
-	        @RequestParam(required = false) String expTo,
-	        Model model) {
+    private final ReportsService reportsService;
+    private final DatabaseService databaseService;
+    private final DatabaseRoleService databaseRoleService;
+    private final CertificateTypeService certificateTypeService;
+    private final DepartmentService departmentService;
 
-	    // Дані для селектів
-	    model.addAttribute("databases", databaseService.findAllDatabase());
-	    model.addAttribute("databaseRoles", databaseRoleService.findAllDatabaseRole());
-	    model.addAttribute("certificateTypes", certificateTypeService.findAllCertificateType());
-	    model.addAttribute("allDepartments", departmentService.getDepartmentsHierarchy());
+    public ReportsController(
+            ReportsService reportsService,
+            DatabaseService databaseService,
+            DatabaseRoleService databaseRoleService,
+            CertificateTypeService certificateTypeService,
+            DepartmentService departmentService
+    ) {
+        this.reportsService = reportsService;
+        this.databaseService = databaseService;
+        this.databaseRoleService = databaseRoleService;
+        this.certificateTypeService = certificateTypeService;
+        this.departmentService = departmentService;
+    }
 
-	    // Перевірка: чи користувач натиснув "Показати"
-	    boolean filtersUsed =
-	            databaseId != null ||
-	            roleId != null ||
-	            certificateTypeId != null ||
-	            departmentId != null ||
-	            expFrom != null ||
-	            expTo != null;
-
-	    if (filtersUsed) {
-
-	        // Конвертація дат
-	        Date expFromDate = expFrom != null && !expFrom.isBlank() ? java.sql.Date.valueOf(expFrom) : null;
-	        Date expToDate   = expTo != null && !expTo.isBlank()   ? java.sql.Date.valueOf(expTo)   : null;
-
-	        List<DBUser> users = reportsService.getReport(
-	                "custom",          // або видали якщо не потрібно
-	                databaseId,
-	                roleId,
-	                certificateTypeId,
-	                departmentId,
-	                expToDate          // або заміни під твою логіку
-	        );
-
-	        model.addAttribute("users", users);
-	    }
-
-	    return "pages/reports/reports";
-	}
+    @GetMapping
+    public String reports(
+            @RequestParam(required = false) Integer departmentId,
+            @RequestParam(required = false) Integer databaseId,
+            @RequestParam(required = false) Integer databaseRoleId,
+            @RequestParam(required = false) Integer certificateTypeId,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationTo,
+            Model model
+    ) {
 
 
-	@GetMapping("/reports/results")
-	public String reportResults(
-	        @RequestParam String reportType,
-	        @RequestParam(required = false) Long databaseId,
-	        @RequestParam(required = false) Long roleId,
-	        @RequestParam(required = false) Long certificateTypeId,
-	        @RequestParam(required = false) Long departmentId,
-	        @RequestParam(required = false) Date expirationBefore,
-	        Model model) {
+        // якщо параметри прийшли як "порожні", але не null
+        if (databaseId != null && databaseId <= 0) {
+            databaseId = null;
+        }
 
-	    List<DBUser> results = reportsService.getReport(
-	            reportType, databaseId, roleId, certificateTypeId, departmentId, expirationBefore
-	    );
+        if (databaseRoleId != null && databaseRoleId <= 0) {
+            databaseRoleId = null;
+        }
 
-	    model.addAttribute("results", results);
-	    return "pages/reports/results :: reportResults";
-	}
-	
+        if (certificateTypeId != null && certificateTypeId <= 0) {
+            certificateTypeId = null;
+        }
+
+
+        model.addAttribute("departments", departmentService.getDepartmentsHierarchy());
+        model.addAttribute("databases", databaseService.findAllDatabase());
+        model.addAttribute("databaseRoles", databaseRoleService.findAllDatabaseRole());
+        model.addAttribute("certificateTypes", certificateTypeService.findAllCertificateType());
+
+        model.addAttribute("departmentId", departmentId);
+        model.addAttribute("databaseId", databaseId);
+        model.addAttribute("databaseRoleId", databaseRoleId);
+        model.addAttribute("certificateTypeId", certificateTypeId);
+
+
+        boolean filtersUsed =
+                departmentId != null ||
+                databaseId != null ||
+                databaseRoleId != null ||
+                certificateTypeId != null ||
+                expirationTo != null;
+
+
+        if (filtersUsed) {
+
+            if (databaseRoleId != null) {
+                databaseId = null;
+                certificateTypeId = null;
+            } else if (databaseId != null) {
+                certificateTypeId = null;
+            }
+
+            ReportFilter filter = new ReportFilter();
+            filter.setDepartmentId(departmentId);
+            filter.setDatabaseId(databaseId);
+            filter.setDatabaseRoleId(databaseRoleId);
+            filter.setCertificateTypeId(certificateTypeId);
+            filter.setExpirationTo(expirationTo);
+
+            List<ReportRowDto> report = reportsService.getReport(filter);
+            model.addAttribute("report", report);
+        }
+
+
+        System.out.println("departmentId=" + departmentId);
+        System.out.println("databaseId=" + databaseId);
+        System.out.println("databaseRoleId=" + databaseRoleId);
+        System.out.println("certificateTypeId=" + certificateTypeId);
+        System.out.println("expirationTo=" + expirationTo);
+
+        return "pages/reports/reports";
+    }
+
+
 }

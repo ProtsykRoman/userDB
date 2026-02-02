@@ -36,7 +36,7 @@ public class DBUser {
 	@ManyToOne
 	@JoinColumn(name = "department_id", referencedColumnName = "id", nullable = false)
 	private Department department;
-	@Column(name = "identificationNumber")
+	@Column(name = "identification_number")
 	private Integer identificationNumber;
 	@Column(name = "is_active")
 	private Boolean isActive = true;

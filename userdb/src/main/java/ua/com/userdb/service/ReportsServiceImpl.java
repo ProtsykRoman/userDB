@@ -1,116 +1,92 @@
 package ua.com.userdb.service;
 
-import ua.com.userdb.model.DBUser;
-import ua.com.userdb.dao.DBUserRepository;
-import org.springframework.stereotype.Service;
+import ua.com.userdb.dao.ReportsRepository;
+import ua.com.userdb.dto.ReportFilter;
+import ua.com.userdb.dto.ReportRowDto;
+import ua.com.userdb.dto.ReportSourceType;
 
-import java.util.Date;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class ReportsServiceImpl implements ReportsService {
 
-    private final DBUserRepository userRepository;
+    private final ReportsRepository reportsRepository;
 
-    public ReportsServiceImpl(
-    		DBUserRepository userRepository
-    ) {
-        this.userRepository = userRepository;
+    public ReportsServiceImpl(ReportsRepository reportsRepository) {
+        this.reportsRepository = reportsRepository;
     }
 
     @Override
-    public List<DBUser> getReport(
-            String type,
-            Long databaseId,
-            Long roleId,
-            Long certificateTypeId,
-            Long departmentId,
-            Date expirationBefore
-    ) {
+    public List<ReportRowDto> getReport(ReportFilter filter) {
 
-        List<DBUser> users = userRepository.findAll();
+        List<ReportRowDto> result = new ArrayList<>();
 
-        // ===== ФІЛЬТР ПО ПІДРОЗДІЛУ =====
-        if (departmentId != null) {
-            users = users.stream()
-                    .filter(u -> u.getDepartment() != null &&
-                            u.getDepartment().getId().equals(departmentId))
-                    .collect(Collectors.toList());
+        boolean hasDate = filter.getExpirationTo() != null;
+
+        if (filter.getCertificateTypeId() != null ||
+            (filter.getDatabaseId() == null && filter.getDatabaseRoleId() == null)) {
+
+            var certs = hasDate
+                ? reportsRepository.findCertificatesWithDate(
+                        filter.getDepartmentId(),
+                        filter.getCertificateTypeId(),
+                        filter.getExpirationTo())
+                : reportsRepository.findCertificatesNoDate(
+                        filter.getDepartmentId(),
+                        filter.getCertificateTypeId());
+
+            certs.forEach(c ->
+                result.add(new ReportRowDto(c, ReportSourceType.CERTIFICATE))
+            );
         }
 
-        switch (type) {
+        // ===== ДОСТУП ПО РОЛІ =====
+        if (filter.getDatabaseRoleId() != null) {
 
-            case "ACCESS":
-                return filterByAccess(users, databaseId);
+            var rows = hasDate
+                ? reportsRepository.findAccessesByRoleWithDate(
+                        filter.getDepartmentId(),
+                        filter.getDatabaseRoleId(),
+                        filter.getExpirationTo())
+                : reportsRepository.findAccessesByRoleNoDate(
+                        filter.getDepartmentId(),
+                        filter.getDatabaseRoleId());
 
-            case "ROLE":
-                return filterByRole(users, roleId);
-
-            case "CERTIFICATE":
-                return filterByCertificate(users, certificateTypeId);
-
-            case "EXPIRING":
-                return filterByExpiring(users, expirationBefore);
-
-            default:
-                return users;
-        }
-    }
-
-    private List<DBUser> filterByAccess(List<DBUser> users, Long databaseId) {
-        return users.stream()
-                .filter(u -> u.getDbUserAccesses().stream()
-                        .anyMatch(a ->
-                                databaseId == null ||
-                                a.getDatabase() != null &&
-                                a.getDatabase().getId().equals(databaseId)
-                        ))
-                .collect(Collectors.toList());
-    }
-
-    private List<DBUser> filterByRole(List<DBUser> users, Long roleId) {
-        return users.stream()
-                .filter(u -> u.getDbUserRoles().stream()
-                        .anyMatch(r ->
-                                roleId == null ||
-                                r.getDatabaseRole() != null &&
-                                r.getDatabaseRole().getId().equals(roleId)
-                        ))
-                .collect(Collectors.toList());
-    }
-
-    private List<DBUser> filterByCertificate(List<DBUser> users, Long certTypeId) {
-        return users.stream()
-                .filter(u -> u.getDbUserCertificates().stream()
-                        .anyMatch(c ->
-                                certTypeId == null ||
-                                c.getCertificateType() != null &&
-                                c.getCertificateType().getId().equals(certTypeId)
-                        ))
-                .collect(Collectors.toList());
-    }
-
-    private List<DBUser> filterByExpiring(List<DBUser> users, Date expirationBefore) {
-
-        if (expirationBefore == null) {
-            return users;
+            rows.forEach(r ->
+                result.add(new ReportRowDto(r, ReportSourceType.ACCESS))
+            );
         }
 
-        return users.stream()
-                .filter(u ->
-                        u.getDbUserCertificates().stream()
-                                .anyMatch(c ->
-                                        c.getExpirationDate() != null &&
-                                        c.getExpirationDate().before(expirationBefore)
-                                )
-                        ||
-                        u.getDbUserAccesses().stream()
-                                .anyMatch(a ->
-                                        a.getAccessExpirationDate() != null &&
-                                        a.getAccessExpirationDate().before(expirationBefore)
-                                )
-                )
-                .collect(Collectors.toList());
+        // ===== ДОСТУП ПО БД =====
+        else if (filter.getDatabaseId() != null) {
+
+            var rows = hasDate
+                ? reportsRepository.findAccessesByDatabaseWithDate(
+                        filter.getDepartmentId(),
+                        filter.getDatabaseId(),
+                        filter.getExpirationTo())
+                : reportsRepository.findAccessesByDatabaseNoDate(
+                        filter.getDepartmentId(),
+                        filter.getDatabaseId());
+
+            rows.forEach(r ->
+                result.add(new ReportRowDto(r, ReportSourceType.ACCESS))
+            );
+        }
+
+        result.sort(Comparator.comparing(
+            ReportRowDto::getExpirationDate,
+            Comparator.nullsLast(Comparator.naturalOrder())
+        ));
+
+        return result;
     }
+
 }
+

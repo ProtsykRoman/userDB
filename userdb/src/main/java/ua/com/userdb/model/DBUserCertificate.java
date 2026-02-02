@@ -1,5 +1,6 @@
 package ua.com.userdb.model;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -37,7 +38,7 @@ public class DBUserCertificate {
 	private CertificateType certificateType;
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date expirationDate;
+	private LocalDate expirationDate;
 	@Column(name="number")
 	private String number;
 	@Column(name="is_blocked")

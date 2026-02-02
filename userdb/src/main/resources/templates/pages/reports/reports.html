@@ -1,114 +1,160 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
 <head>
-    <title layout:fragment="title">Звіти</title>
-    <link rel="stylesheet" th:href="@{/css/form-userDB.css}">
-    <link rel="icon" type="image/png" th:href="@{/favicon.png}">
+<title layout:fragment="title">Звіти</title>
+<link rel="stylesheet" th:href="@{/css/form-userDB.css}">
+
+<style>
+select:disabled {
+	background-color: #e0e0e0;
+	color: #666;
+	cursor: not-allowed;
+}
+</style>
+
+<script>
+        function toggleFilters() {
+            const cert = document.getElementById('certificateTypeId');
+            const db   = document.getElementById('databaseId');
+            const role = document.getElementById('databaseRoleId');
+
+            cert.disabled = false;
+            db.disabled = false;
+            role.disabled = false;
+
+            if (cert.value) {
+                db.disabled = true;
+                role.disabled = true;
+            } else if (db.value) {
+                cert.disabled = true;
+                role.disabled = true;
+            } else if (role.value) {
+                cert.disabled = true;
+                db.disabled = true;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleFilters();
+
+            ['certificateTypeId', 'databaseId', 'databaseRoleId']
+                .forEach(id =>
+                    document.getElementById(id)
+                        .addEventListener('change', toggleFilters)
+                );
+
+            // 🔑 КЛЮЧОВЕ: перед submit знімаємо disabled
+            document.querySelector('form').addEventListener('submit', () => {
+                document
+                    .querySelectorAll('select:disabled')
+                    .forEach(s => s.disabled = false);
+            });
+        });
+    </script>
 </head>
+
 <body>
-<div layout:fragment="content" class="form-container">
+	<div layout:fragment="content" class="form-container">
 
-    <h2>Формування звітів</h2>
+		<h2>Формування звітів</h2>
 
-    <form th:action="@{/reports}" method="get">
+		<form th:action="@{/reports}" method="get">
 
-        <!-- Рядок фільтрів -->
-        <div class="form-row">
+			<div class="form-row">
 
-            <div class="form-group">
-                <label for="database">База даних:</label>
-                <select id="database" name="databaseId">
-                    <option value="">-- Всі бази --</option>
-                    <option th:each="db : ${databases}" th:value="${db.id}" th:text="${db.name}"
-                        th:selected="${param.databaseId == db.id}"></option>
-                </select>
-            </div>
+				<div class="form-group">
+					<label>Підрозділ</label> <select name="departmentId">
+						<option value="">-- всі --</option>
+						<option th:each="d : ${departments}" th:value="${d.id}"
+							th:text="${'--'.repeat(d.level) + d.name}"
+							th:selected="${departmentId == d.id}"></option>
+					</select>
+				</div>
 
-            <div class="form-group">
-                <label for="role">Роль:</label>
-                <select id="role" name="roleId">
-                    <option value="">-- Всі ролі --</option>
-                    <option th:each="r : ${databaseRoles}" th:value="${r.id}" th:text="${r.name + ' (' + r.database.name + ')'}"
-                        th:selected="${param.roleId == r.id}"></option>
-                </select>
-            </div>
+				<div class="form-group">
+					<label>База даних</label> <select id="databaseId" name="databaseId">
+						<option value="">-- всі --</option>
+						<option th:each="db : ${databases}" th:value="${db.id}"
+							th:text="${db.name}" th:selected="${databaseId == db.id}">
+						</option>
+					</select>
+				</div>
 
-            <div class="form-group">
-                <label for="certificate">Сертифікат:</label>
-                <select id="certificate" name="certificateTypeId">
-                    <option value="">-- Всі сертифікати --</option>
-                    <option th:each="c : ${certificateTypes}" th:value="${c.id}" th:text="${c.name}"
-                        th:selected="${param.certificateTypeId == c.id}"></option>
-                </select>
-            </div>
+				<div class="form-group">
+					<label>Роль</label> <select id="databaseRoleId"
+						name="databaseRoleId">
+						<option value="">-- всі --</option>
+						<option th:each="r : ${databaseRoles}" th:value="${r.id}"
+							th:text="${r.name + ' (' + r.database.name + ')'}"
+							th:selected="${databaseRoleId == r.id}"></option>
+					</select>
+				</div>
 
-        </div>
+				<div class="form-group">
+					<label>Тип сертифікату</label> <select id="certificateTypeId"
+						name="certificateTypeId">
+						<option value="">-- всі --</option>
+						<option th:each="c : ${certificateTypes}" th:value="${c.id}"
+							th:text="${c.name}" th:selected="${certificateTypeId == c.id}">
+						</option>
+					</select>
+				</div>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label for="expFrom">Закінчення від:</label>
-                <input type="date" id="expFrom" name="expFrom" th:value="${param.expFrom}" />
-            </div>
+			</div>
 
-            <div class="form-group">
-                <label for="expTo">Закінчення до:</label>
-                <input type="date" id="expTo" name="expTo" th:value="${param.expTo}" />
-            </div>
+			<div class="form-row">
+				<div class="form-group">
+					<label>Закінчення до</label> <input type="date" name="expirationTo"
+						th:value="${param.expirationTo}">
+				</div>
+			</div>
 
-            <div class="form-group">
-                <label for="department">Підрозділ:</label>
-                <select id="department" name="departmentId">
-                    <option value="">-- Всі підрозділи --</option>
-                    <option th:each="dept : ${allDepartments}" th:value="${dept.id}"
-                        th:text="${'--'.repeat(dept.level) + dept.name}"
-                        th:selected="${param.departmentId == dept.id}"></option>
-                </select>
-            </div>
-        </div>
+			<div class="form-buttons">
+				<button type="submit" class="btn-add">Показати</button>
+				<a th:href="@{/reports}" class="btn-cancel">Очистити</a>
+			</div>
 
-        <div class="form-buttons">
-            <button type="submit" class="btn-add">Показати</button>
-            <a th:href="@{/reports}" class="btn-cancel">Очистити</a>
-        </div>
-    </form>
+		</form>
 
-    <!-- Таблиця результатів -->
-    <div th:if="${users != null}">
-        <h3>Результати</h3>
-        <table class="list-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>ПІБ</th>
-                    <th>Звання</th>
-                    <th>Підрозділ</th>
-                    <th>Ідентифікаційний</th>
-                    <th>Активний</th>
-                    <th>Сертифікати</th>
-                    <th>Бази / Ролі</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="user : ${users}">
-                    <td th:text="${user.id}"></td>
-                    <td th:text="${user.name}"></td>
-                    <td th:text="${user.rank?.name}"></td>
-                    <td th:text="${user.department != null ? '--'.repeat(user.department.level) + user.department.name : ''}"></td>
-                    <td th:text="${user.identificationNumber}"></td>
-                    <td th:text="${user.isActive} ? 'Так' : 'Ні'"></td>
-                    <td>
-                        <span th:each="c : ${user.dbUserCertificates}" th:text="${c.certificateType?.name} + ' (' + c.expirationDate + ')'" style="display:block;"></span>
-                    </td>
-                    <td>
-                        <span th:each="a : ${user.dbUserAccesses}" th:text="${a.database?.name + ' / ' + a.databaseRole?.name}" style="display:block;"></span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+		<div th:if="${report != null}">
+			<h3>Результати</h3>
 
-</div>
+			<table class="list-table">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>ПІБ</th>
+						<th>Підрозділ</th>
+						<th>Активний</th>
+						<th>Тип</th>
+						<th>Деталі</th>
+						<th>Дата закінчення</th>
+					</tr>
+				</thead>
+
+				<tbody>
+					<tr th:each="row : ${report}">
+						<td th:text="${row.identificationNumber}"></td>
+						<td><a th:href="@{/dbusers/edit/{id}(id=${row.userId})}"
+							th:text="${row.userName}"> </a></td>
+						<td th:text="${row.departmentName}"></td>
+						<td th:text="${row.isActive ? 'Так' : 'Ні'}"></td>
+						<td th:text="${row.source}"></td>
+						<td><span
+							th:if="${row.source == T(ua.com.userdb.dto.ReportSourceType).CERTIFICATE}"
+							th:text="${row.certificateTypeName}"></span> <span
+							th:if="${row.source == T(ua.com.userdb.dto.ReportSourceType).ACCESS}"
+							th:text="${row.databaseName + (row.databaseRoleName != null ? ' / ' + row.databaseRoleName : '')}">
+						</span></td>
+						<td
+							th:text="${row.expirationDate != null ? #temporals.format(row.expirationDate, 'yyyy-MM-dd') : ''}"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
 </body>
 </html>

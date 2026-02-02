@@ -1,5 +1,6 @@
 package ua.com.userdb.model;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -37,7 +38,7 @@ public class DBUserAccess {
 	private Database database;
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date accessExpirationDate;
+	private LocalDate accessExpirationDate;
 	@Column(name="is_blocked")
-	private Boolean isBlocked;
+	private Boolean isBlocked = false;
 }
