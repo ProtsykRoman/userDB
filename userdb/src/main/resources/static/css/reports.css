@@ -1,0 +1,147 @@
+/* --- Базові стилі кнопок (як було колись) --- */
+.btn-add, .btn-submit, .btn-search {
+    background-color: #4a6fa5;
+    color: #ffffff !important;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s, transform 0.2s;
+    text-decoration: none;
+}
+
+.btn-add:hover, .btn-submit:hover, .btn-search:hover {
+    background-color: #3a5c8e;
+    transform: translateY(-1px);
+}
+
+.btn-export-excel {
+    background-color: #28a745; 
+    color: #ffffff !important;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none; 
+    display: inline-block; 
+}
+
+.btn-export-excel:hover {
+    background-color: #218838;
+}
+
+.btn-cancel {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+    background: #b0b0b0;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* --- Контейнер форми звітів --- */
+.form-container {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    padding: 25px 35px;
+    max-width: 1100px; /* Збільшено для широкої таблиці */
+    margin: 20px auto;
+}
+
+.form-container h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 7px 10px;
+    border-radius: 5px;
+    border: 1px solid #cfd4da;
+    box-sizing: border-box;
+}
+
+/* --- Таблиця (ПОВЕРНЕНО СТАРИЙ СТИЛЬ) --- */
+.list-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    /* ТУТ НЕМАЄ table-layout: fixed, щоб колонки розширювалися автоматично */
+}
+
+.list-table th, .list-table td {
+    border: 1px solid #ddd;
+    padding: 6px 8px;
+    font-size: 13px;
+    text-align: center; /* Центрування як раніше */
+}
+
+.list-table th {
+    background: #f5f7fa;
+    font-weight: 600;
+}
+
+.list-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+.list-table a {
+    color: #4a6fa5;
+    text-decoration: none;
+}
+
+.list-table a:hover {
+    text-decoration: underline;
+}
+
+/* --- Пагінація --- */
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    font-size: 13px;
+}
+
+.pagination-buttons a {
+    display: inline-block;
+    padding: 4px 10px;
+    margin-left: 5px;
+    background-color: #4a6fa5;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}

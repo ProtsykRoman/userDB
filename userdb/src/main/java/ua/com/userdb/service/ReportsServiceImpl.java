@@ -30,73 +30,76 @@ public class ReportsServiceImpl implements ReportsService {
 
         // ================= CERTIFICATES =================
         if (filter.getCertificateTypeId() != null) {
-
             var rows = hasDate
-                ? reportsRepository.findCertificatesWithDate(
-                        filter.getDepartmentId(),
-                        filter.getCertificateTypeId(),
-                        filter.getExpirationTo())
-                : reportsRepository.findCertificatesNoDate(
-                        filter.getDepartmentId(),
-                        filter.getCertificateTypeId());
+                    ? reportsRepository.findCertificatesWithDate(
+                            filter.getDepartmentId(),
+                            filter.getCertificateTypeId(),
+                            filter.getExpirationTo())
+                    : reportsRepository.findCertificatesNoDate(
+                            filter.getDepartmentId(),
+                            filter.getCertificateTypeId());
 
             rows.forEach(r ->
-                result.add(new ReportRowDto(r, ReportSourceType.CERTIFICATE))
+                    result.add(new ReportRowDto(r, ReportSourceType.CERTIFICATE))
             );
-
             return sort(result);
         }
 
         // ================= ACCESS BY ROLE =================
         if (filter.getDatabaseRoleId() != null) {
-
             var rows = hasDate
-                ? reportsRepository.findAccessesByRoleWithDate(
-                        filter.getDepartmentId(),
-                        filter.getDatabaseRoleId(),
-                        filter.getExpirationTo())
-                : reportsRepository.findAccessesByRoleNoDate(
-                        filter.getDepartmentId(),
-                        filter.getDatabaseRoleId());
+                    ? reportsRepository.findAccessesByRoleWithDate(
+                            filter.getDepartmentId(),
+                            filter.getDatabaseRoleId(),
+                            filter.getExpirationTo())
+                    : reportsRepository.findAccessesByRoleNoDate(
+                            filter.getDepartmentId(),
+                            filter.getDatabaseRoleId());
 
             rows.forEach(r ->
-                result.add(new ReportRowDto(r, ReportSourceType.ACCESS))
+                    result.add(new ReportRowDto(r, ReportSourceType.ACCESS))
             );
-
             return sort(result);
         }
 
         // ================= ACCESS BY DATABASE =================
         if (filter.getDatabaseId() != null) {
-
             var rows = hasDate
-                ? reportsRepository.findAccessesByDatabaseWithDate(
-                        filter.getDepartmentId(),
-                        filter.getDatabaseId(),
-                        filter.getExpirationTo())
-                : reportsRepository.findAccessesByDatabaseNoDate(
-                        filter.getDepartmentId(),
-                        filter.getDatabaseId());
+                    ? reportsRepository.findAccessesByDatabaseWithDate(
+                            filter.getDepartmentId(),
+                            filter.getDatabaseId(),
+                            filter.getExpirationTo())
+                    : reportsRepository.findAccessesByDatabaseNoDate(
+                            filter.getDepartmentId(),
+                            filter.getDatabaseId());
 
             rows.forEach(r ->
-                result.add(new ReportRowDto(r, ReportSourceType.ACCESS))
+                    result.add(new ReportRowDto(r, ReportSourceType.ACCESS))
             );
+            return sort(result);
+        }
 
+        // ================= ONLY DEPARTMENT =================
+        if (filter.isOnlyDepartmentSelected()) {
+            var rows = hasDate
+                ? reportsRepository.findAccessesByDepartmentWithDate(filter.getDepartmentId(), filter.getExpirationTo())
+                : reportsRepository.findAccessesByDepartmentNoDate(filter.getDepartmentId());
+            rows.forEach(r -> result.add(new ReportRowDto(r, ReportSourceType.ACCESS)));
             return sort(result);
         }
 
         // ================= DEFAULT: CERTIFICATES =================
         var rows = hasDate
-            ? reportsRepository.findCertificatesWithDate(
-                    filter.getDepartmentId(),
-                    null,
-                    filter.getExpirationTo())
-            : reportsRepository.findCertificatesNoDate(
-                    filter.getDepartmentId(),
-                    null);
+                ? reportsRepository.findCertificatesWithDate(
+                        filter.getDepartmentId(),
+                        null,
+                        filter.getExpirationTo())
+                : reportsRepository.findCertificatesNoDate(
+                        filter.getDepartmentId(),
+                        null);
 
         rows.forEach(r ->
-            result.add(new ReportRowDto(r, ReportSourceType.CERTIFICATE))
+                result.add(new ReportRowDto(r, ReportSourceType.CERTIFICATE))
         );
 
         return sort(result);
@@ -104,11 +107,9 @@ public class ReportsServiceImpl implements ReportsService {
 
     private List<ReportRowDto> sort(List<ReportRowDto> list) {
         list.sort(Comparator.comparing(
-            ReportRowDto::getExpirationDate,
-            Comparator.nullsLast(Comparator.naturalOrder())
+                ReportRowDto::getExpirationDate,
+                Comparator.nullsLast(Comparator.naturalOrder())
         ));
         return list;
     }
 }
-
-

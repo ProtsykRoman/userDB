@@ -16,135 +16,117 @@ public class ReportExcelWriter {
 
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    private static CellStyle createHeaderStyle(Workbook workbook, IndexedColors color) {
+    private static CellStyle createHeaderStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
         font.setBold(true);
         style.setFont(font);
-        style.setFillForegroundColor(color.getIndex());
+        style.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
+        setAllBorders(style);
         style.setAlignment(HorizontalAlignment.CENTER);
         return style;
     }
 
     private static CellStyle createCellStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
-        style.setBorderTop(BorderStyle.THIN);
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
+        setAllBorders(style);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
         return style;
     }
 
+    private static CellStyle createDateCellStyle(Workbook workbook, CellStyle baseStyle) {
+        CellStyle dateStyle = workbook.createCellStyle();
+        dateStyle.cloneStyleFrom(baseStyle);
+        CreationHelper createHelper = workbook.getCreationHelper();
+        dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd"));
+        return dateStyle;
+    }
+
+    private static void setAllBorders(CellStyle style) {
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+    }
+
+    // ====================== CERTIFICATES ======================
     public static void writeCertificates(List<ReportRowDto> rows, OutputStream os) throws IOException {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Certificates");
-
-            Row header = sheet.createRow(0);
-            String[] columns = {"ІПН", "ПІБ", "Підрозділ", "Активний", "Тип сертифікату", "Дата закінчення"};
-
-            CellStyle headerStyle = createHeaderStyle(workbook, IndexedColors.LIGHT_GREEN);
-            CellStyle cellStyle = createCellStyle(workbook);
-
-            for (int i = 0; i < columns.length; i++) {
-                Cell cell = header.createCell(i);
-                cell.setCellValue(columns[i]);
-                cell.setCellStyle(headerStyle);
-            }
-
-            CellStyle dateStyle = workbook.createCellStyle();
-            CreationHelper createHelper = workbook.getCreationHelper();
-            dateStyle.cloneStyleFrom(cellStyle);
-            dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd"));
-
-            int rowIdx = 1;
-            for (ReportRowDto r : rows) {
-                Row row = sheet.createRow(rowIdx++);
-                int col = 0;
-
-                Cell cell1 = row.createCell(col++);
-                cell1.setCellValue(r.getIdentificationNumber() != null ? String.valueOf(r.getIdentificationNumber()) : "");
-                cell1.setCellStyle(cellStyle);
-
-                Cell cell2 = row.createCell(col++);
-                cell2.setCellValue(r.getUserName());
-                cell2.setCellStyle(cellStyle);
-
-                Cell cell3 = row.createCell(col++);
-                cell3.setCellValue(r.getDepartmentName());
-                cell3.setCellStyle(cellStyle);
-
-                Cell cell4 = row.createCell(col++);
-                cell4.setCellValue(r.getIsActive() != null && r.getIsActive() ? "Так" : "Ні");
-                cell4.setCellStyle(cellStyle);
-
-                Cell cell5 = row.createCell(col++);
-                cell5.setCellValue(r.getCertificateTypeName() != null ? r.getCertificateTypeName() : "");
-                cell5.setCellStyle(cellStyle);
-
-                Cell cell6 = row.createCell(col++);
-                if (r.getExpirationDate() != null) {
-                    cell6.setCellValue(DATE_FORMAT.format(r.getExpirationDate()));
-                }
-                cell6.setCellStyle(dateStyle);
-            }
-
-            for (int i = 0; i < columns.length; i++) {
-                sheet.autoSizeColumn(i);
-                sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 2000);
-            }
-
+            String[] columns = { "ІПН", "ПІБ", "Підрозділ", "Активний", "Тип сертифікату", "Дата закінчення" };
+            writeRows(workbook, sheet, columns, rows, false, true, true);
             workbook.write(os);
         }
     }
 
+    // ====================== ACCESSES ======================
     public static void writeAccesses(List<ReportRowDto> rows, OutputStream os) throws IOException {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Accesses");
+            String[] columns = { "ІПН", "ПІБ", "Підрозділ", "Активний", "База даних", "Роль", "Дата закінчення" };
+            writeRows(workbook, sheet, columns, rows, true, false, false);
+            workbook.write(os);
+        }
+    }
 
-            Row header = sheet.createRow(0);
-            String[] columns = {"ІПН", "ПІБ", "Підрозділ", "Активний", "База даних", "Роль", "Дата закінчення"};
+    // ====================== ACCESSES & CERTIFICATES ======================
+    public static void writeAccessesAndCertificates(List<ReportRowDto> rows, OutputStream os,
+                                                    boolean showCertificateColumn) throws IOException {
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Accesses & Certificates");
 
-            CellStyle headerStyle = createHeaderStyle(workbook, IndexedColors.LIGHT_CORNFLOWER_BLUE);
-            CellStyle cellStyle = createCellStyle(workbook);
-
-            for (int i = 0; i < columns.length; i++) {
-                Cell cell = header.createCell(i);
-                cell.setCellValue(columns[i]);
-                cell.setCellStyle(headerStyle);
+            String[] columns;
+            if (showCertificateColumn) {
+                columns = new String[] { "ІПН", "ПІБ", "Підрозділ", "Активний", "База даних", "Роль", "Тип сертифікату", "Дата закінчення" };
+            } else {
+                columns = new String[] { "ІПН", "ПІБ", "Підрозділ", "Активний", "База даних", "Роль", "Дата закінчення" };
             }
 
-            CellStyle dateStyle = workbook.createCellStyle();
-            CreationHelper createHelper = workbook.getCreationHelper();
-            dateStyle.cloneStyleFrom(cellStyle);
-            dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd"));
+            writeRows(workbook, sheet, columns, rows, true, showCertificateColumn, showCertificateColumn);
+            workbook.write(os);
+        }
+    }
 
-            int rowIdx = 1;
-            for (ReportRowDto r : rows) {
-                Row row = sheet.createRow(rowIdx++);
-                int col = 0;
+    // ====================== COMMON WRITE LOGIC ======================
+    private static void writeRows(Workbook workbook, Sheet sheet, String[] columns, List<ReportRowDto> rows,
+                                  boolean includeDatabase, boolean includeCertificate, boolean showCertificateColumn) {
 
-                Cell cell1 = row.createCell(col++);
-                cell1.setCellValue(r.getIdentificationNumber() != null ? String.valueOf(r.getIdentificationNumber()) : "");
-                cell1.setCellStyle(cellStyle);
+        Row header = sheet.createRow(0);
+        CellStyle headerStyle = createHeaderStyle(workbook);
+        CellStyle cellStyle = createCellStyle(workbook);
+        CellStyle dateStyle = createDateCellStyle(workbook, cellStyle);
 
-                Cell cell2 = row.createCell(col++);
-                cell2.setCellValue(r.getUserName());
-                cell2.setCellStyle(cellStyle);
+        // ===== HEADER =====
+        for (int i = 0; i < columns.length; i++) {
+            Cell cell = header.createCell(i);
+            cell.setCellValue(columns[i]);
+            cell.setCellStyle(headerStyle);
+        }
 
-                Cell cell3 = row.createCell(col++);
-                cell3.setCellValue(r.getDepartmentName());
-                cell3.setCellStyle(cellStyle);
+        // ===== DATA =====
+        for (int rowIdx = 0; rowIdx < rows.size(); rowIdx++) {
+            ReportRowDto r = rows.get(rowIdx);
+            Row row = sheet.createRow(rowIdx + 1);
+            int col = 0;
 
-                Cell cell4 = row.createCell(col++);
-                cell4.setCellValue(r.getIsActive() != null && r.getIsActive() ? "Так" : "Ні");
-                cell4.setCellStyle(cellStyle);
+            Cell cell1 = row.createCell(col++);
+            cell1.setCellValue(r.getIdentificationNumber() != null ? String.valueOf(r.getIdentificationNumber()) : "");
+            cell1.setCellStyle(cellStyle);
 
+            Cell cell2 = row.createCell(col++);
+            cell2.setCellValue(r.getUserName() != null ? r.getUserName() : "");
+            cell2.setCellStyle(cellStyle);
+
+            Cell cell3 = row.createCell(col++);
+            cell3.setCellValue(r.getDepartmentName() != null ? r.getDepartmentName() : "");
+            cell3.setCellStyle(cellStyle);
+
+            Cell cell4 = row.createCell(col++);
+            cell4.setCellValue(r.getIsActive() != null && r.getIsActive() ? "Так" : "Ні");
+            cell4.setCellStyle(cellStyle);
+
+            if (includeDatabase) {
                 Cell cell5 = row.createCell(col++);
                 cell5.setCellValue(r.getDatabaseName() != null ? r.getDatabaseName() : "");
                 cell5.setCellStyle(cellStyle);
@@ -152,20 +134,34 @@ public class ReportExcelWriter {
                 Cell cell6 = row.createCell(col++);
                 cell6.setCellValue(r.getDatabaseRoleName() != null ? r.getDatabaseRoleName() : "");
                 cell6.setCellStyle(cellStyle);
+            }
 
+            if (includeCertificate && showCertificateColumn) {
                 Cell cell7 = row.createCell(col++);
-                if (r.getExpirationDate() != null) {
-                    cell7.setCellValue(DATE_FORMAT.format(r.getExpirationDate()));
+                cell7.setCellValue(r.getCertificateTypeName() != null ? r.getCertificateTypeName() : "");
+                cell7.setCellStyle(cellStyle);
+            }
+
+            // Дата завжди остання
+            Cell dateCell = row.createCell(col++);
+            if (r.getExpirationDate() != null) {
+                dateCell.setCellValue(DATE_FORMAT.format(r.getExpirationDate()));
+            }
+            dateCell.setCellStyle(dateStyle);
+
+            // Додаємо рамку для всіх клітинок на рядку навіть пустих
+            for (int i = 0; i < col; i++) {
+                if (row.getCell(i) == null) {
+                    Cell emptyCell = row.createCell(i);
+                    emptyCell.setCellStyle(cellStyle);
                 }
-                cell7.setCellStyle(dateStyle);
             }
+        }
 
-            for (int i = 0; i < columns.length; i++) {
-                sheet.autoSizeColumn(i);
-                sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 2000);
-            }
-
-            workbook.write(os);
+        // ===== AUTO SIZE =====
+        for (int i = 0; i < columns.length; i++) {
+            sheet.autoSizeColumn(i);
+            sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 2000);
         }
     }
 }

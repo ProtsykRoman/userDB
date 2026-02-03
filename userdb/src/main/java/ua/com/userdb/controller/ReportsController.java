@@ -2,7 +2,6 @@ package ua.com.userdb.controller;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -58,21 +57,24 @@ public class ReportsController {
             @RequestParam(defaultValue = "20") int size,
             Model model
     ) {
+        if (databaseId != null && databaseId <= 0) databaseId = null;
+        if (databaseRoleId != null && databaseRoleId <= 0) databaseRoleId = null;
+        if (certificateTypeId != null && certificateTypeId <= 0) certificateTypeId = null;
 
+        boolean onlyDepartmentSelected =
+                departmentId != null &&
+                databaseId == null &&
+                databaseRoleId == null &&
+                certificateTypeId == null;
 
-        // якщо параметри прийшли як "порожні", але не null
-        if (databaseId != null && databaseId <= 0) {
-            databaseId = null;
+        if (!onlyDepartmentSelected) {
+            if (databaseRoleId != null) {
+                databaseId = null;
+                certificateTypeId = null;
+            } else if (databaseId != null) {
+                certificateTypeId = null;
+            }
         }
-
-        if (databaseRoleId != null && databaseRoleId <= 0) {
-            databaseRoleId = null;
-        }
-
-        if (certificateTypeId != null && certificateTypeId <= 0) {
-            certificateTypeId = null;
-        }
-
 
         model.addAttribute("departments", departmentService.getDepartmentsHierarchy());
         model.addAttribute("databases", databaseService.findAllDatabase());
@@ -84,7 +86,6 @@ public class ReportsController {
         model.addAttribute("databaseRoleId", databaseRoleId);
         model.addAttribute("certificateTypeId", certificateTypeId);
 
-
         boolean filtersUsed =
                 departmentId != null ||
                 databaseId != null ||
@@ -92,31 +93,24 @@ public class ReportsController {
                 certificateTypeId != null ||
                 expirationTo != null;
 
-
         if (filtersUsed) {
-
-            if (databaseRoleId != null) {
-                databaseId = null;
-                certificateTypeId = null;
-            } else if (databaseId != null) {
-                certificateTypeId = null;
-            }
-
             ReportFilter filter = new ReportFilter();
             filter.setDepartmentId(departmentId);
             filter.setDatabaseId(databaseId);
             filter.setDatabaseRoleId(databaseRoleId);
             filter.setCertificateTypeId(certificateTypeId);
             filter.setExpirationTo(expirationTo);
+            filter.setOnlyDepartmentSelected(onlyDepartmentSelected);
 
             List<ReportRowDto> fullReport = reportsService.getReport(filter);
-            
+
             int totalRecords = fullReport.size();
             int totalPages = (int) Math.ceil((double) totalRecords / size);
-            
+
             int fromIndex = Math.min((page - 1) * size, totalRecords);
             int toIndex = Math.min(fromIndex + size, totalRecords);
             List<ReportRowDto> reportPage = fullReport.subList(fromIndex, toIndex);
+
             model.addAttribute("report", reportPage);
             model.addAttribute("currentPage", page);
             model.addAttribute("pageSize", size);
@@ -126,7 +120,7 @@ public class ReportsController {
 
         return "pages/reports/reports";
     }
-    
+
     @GetMapping("/export")
     public void exportToExcel(
             @RequestParam(required = false) Integer departmentId,
@@ -138,12 +132,20 @@ public class ReportsController {
             HttpServletResponse response
     ) throws IOException {
 
-        // нормалізація (як у reports)
-        if (databaseRoleId != null) {
-            databaseId = null;
-            certificateTypeId = null;
-        } else if (databaseId != null) {
-            certificateTypeId = null;
+        boolean onlyDepartmentSelected =
+                departmentId != null &&
+                databaseId == null &&
+                databaseRoleId == null &&
+                certificateTypeId == null;
+
+        // Виправляємо пріоритет фільтрів
+        if (!onlyDepartmentSelected) {
+            if (databaseRoleId != null) {
+                databaseId = null;
+                certificateTypeId = null;
+            } else if (databaseId != null) {
+                certificateTypeId = null;
+            }
         }
 
         ReportFilter filter = new ReportFilter();
@@ -152,25 +154,29 @@ public class ReportsController {
         filter.setDatabaseRoleId(databaseRoleId);
         filter.setCertificateTypeId(certificateTypeId);
         filter.setExpirationTo(expirationTo);
+        filter.setOnlyDepartmentSelected(onlyDepartmentSelected);
 
         List<ReportRowDto> report = reportsService.getReport(filter);
 
         response.setContentType(
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         );
         response.setHeader(
-            "Content-Disposition",
-            "attachment; filename=report.xlsx"
+                "Content-Disposition",
+                "attachment; filename=report.xlsx"
         );
 
-        // ===== ВИКЛИК ЗАЛЕЖНО ВІД ТИПУ =====
         if (certificateTypeId != null) {
+            // Вибрані сертифікати — колонка є
             ReportExcelWriter.writeCertificates(report, response.getOutputStream());
+        } else if (onlyDepartmentSelected) {
+            // Вибрано лише підрозділ — не показуємо колонку сертифікатів
+            boolean showCertificateColumn = false;
+            ReportExcelWriter.writeAccessesAndCertificates(report, response.getOutputStream(), showCertificateColumn);
         } else {
-            // доступ по базі або ролі
+            // Вибрано доступи (бази/ролі) — колонка сертифікатів не показуємо
             ReportExcelWriter.writeAccesses(report, response.getOutputStream());
         }
     }
-
 
 }

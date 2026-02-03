@@ -1,7 +1,6 @@
 package ua.com.userdb.dto;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,4 +17,7 @@ public class ReportFilter {
     private Integer databaseRoleId;
     private Integer certificateTypeId;
     private LocalDate expirationTo;
+    private boolean onlyDepartmentSelected;
 }
+
+

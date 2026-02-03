@@ -1,4 +1,4 @@
-/* Системні шрифти — чітко і без зовнішніх ресурсів */
+/* Системні шрифти */
 body {
     margin: 0;
     padding: 0;
@@ -10,7 +10,6 @@ body {
     align-items: center;
 }
 
-/* Центр */
 .login-container {
     display: flex;
     justify-content: center;
@@ -18,7 +17,6 @@ body {
     width: 100%;
 }
 
-/* Основний блок */
 .login-box {
     width: 360px;
     padding: 40px;
@@ -40,6 +38,12 @@ body {
     margin-bottom: 25px;
 }
 
+/* Обгортка для пароля, щоб іконка була всередині */
+.password-wrapper {
+    display: flex;
+    align-items: center;
+}
+
 .textbox input {
     width: 100%;
     padding: 12px 14px;
@@ -50,11 +54,38 @@ body {
     font-size: 15px;
     color: #333;
     transition: border 0.3s, box-shadow 0.3s;
+    box-sizing: border-box; /* Важливо для правильного розрахунку ширини */
+}
+
+/* Окремий відступ для пароля, щоб текст не накладався на іконку */
+.password-wrapper input {
+    padding-right: 45px;
 }
 
 .textbox input:focus {
     border: 1px solid #4a6fa5;
     box-shadow: 0 0 5px rgba(74, 111, 165, 0.3);
+}
+
+/* Стиль іконки */
+.toggle-password {
+    position: absolute;
+    right: 14px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: 0.2s;
+    user-select: none;
+}
+
+.toggle-password:hover {
+    opacity: 1;
+    color: #4a6fa5;
 }
 
 /* Кнопка */
@@ -81,10 +112,12 @@ body {
     color: #b00020;
     margin-top: 15px;
     font-size: 14px;
+    font-weight: 500;
 }
 
 .success-message {
     color: #0a7a20;
     margin-top: 15px;
     font-size: 14px;
+    font-weight: 500;
 }

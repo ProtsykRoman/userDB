@@ -3,44 +3,44 @@
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    padding: 25px 30px;
-    margin-top: 30px;
+    padding: 15px 20px; /* Компактні відступи */
+    margin-top: 20px;
 }
 
 /* === Заголовок сторінки === */
 .list-container h2 {
     color: #2c3e50;
     margin-top: 0;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     font-weight: 500;
+    font-size: 1.3rem;
 }
 
+/* === Кнопка "Додати" === */
 .btn-add {
     display: inline-block;
-    background-color: #4a6fa5; /* той самий синій, що у th */
-    color: #ffffff !important;  /* обов’язково білий текст */
-    padding: 10px 18px;
+    background-color: #4a6fa5;
+    color: #ffffff !important;
+    padding: 8px 14px;
     border-radius: 6px;
     text-decoration: none;
     font-weight: 500;
+    font-size: 14px;
     border: none;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    margin-bottom: 20px;
+    transition: background-color 0.2s ease-in-out;
+    margin-bottom: 15px;
 }
 
 .btn-add:hover {
     background-color: #3a5c8e;
-    color: #ffffff !important;  /* і при наведенні теж */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
-
 
 /* === Таблиця === */
 .list-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 15px;
+    font-size: 13px; /* Зменшено для компактності */
     background: #f9fafc;
     border-radius: 8px;
     overflow: hidden;
@@ -49,66 +49,104 @@
 .list-table th {
     background-color: #4a6fa5;
     color: #ffffff;
-    padding: 12px 15px;
+    padding: 10px 8px;
     text-align: left;
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .list-table td {
-    padding: 12px 15px;
+    padding: 8px 8px;
     border-bottom: 1px solid #e0e4eb;
     color: #2c3e50;
+    vertical-align: middle;
 }
 
 .list-table tr:hover {
     background-color: #eef3fb;
-    transition: background 0.3s ease;
+    transition: background 0.2s ease;
 }
 
-/* === Дії у списку === */
-.table-actions a {
+/* === Фільтри прямо в таблиці === */
+.filter-row td {
+    background: #f1f3f7;
+    padding: 6px 8px !important;
+}
+
+.filter-row input, 
+.filter-row select {
+    width: 100%;
+    padding: 4px 6px;
+    font-size: 12px;
+    border: 1px solid #cbd2d9;
+    border-radius: 4px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.filter-row input:focus {
+    border-color: #4a6fa5;
+}
+
+/* === Кнопки дій (Редагувати, Пошук, Очистити) === */
+.table-actions, .filter-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+/* Універсальний стиль для кнопок-посилань та кнопок-форм */
+.btn-edit, .btn-delete, .btn-search, .btn-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-decoration: none;
-    padding: 6px 12px;
-    border-radius: 5px;
-    color: #ffffff;
-    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
     font-weight: 500;
-    margin-right: 8px;
-    transition: background-color 0.2s ease-in-out;
+    border: none;
+    cursor: pointer;
+    color: #ffffff !important;
+    transition: background-color 0.2s;
+    white-space: nowrap;
 }
 
-/* Кнопка "Редагувати" */
-.table-actions .btn-edit {
-    background-color: #3b7ddd; /* яскравий синій */
-}
+/* Кольори */
+.btn-edit { background-color: #3b7ddd; }
+.btn-edit:hover { background-color: #2f68ba; }
 
-.table-actions .btn-edit:hover {
-    background-color: #2f68ba;
-    color: #ffffff;
-}
+.btn-delete { background-color: #e53935; }
+.btn-delete:hover { background-color: #c62828; }
 
-/* Кнопка "Видалити" */
-.table-actions .btn-delete {
-    background-color: #e53935; /* яскраво-червоний */
-}
+.btn-search { background-color: #4a6fa5; }
+.btn-search:hover { background-color: #3a5c8e; }
 
-.table-actions .btn-delete:hover {
-    background-color: #c62828; /* темніший червоний */
-    color: #ffffff;
+.btn-clear { 
+    background-color: #6c757d; 
+    line-height: 1;
 }
+.btn-clear:hover { background-color: #5a6268; }
 
+/* === Пагінація === */
 .pagination {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: 15px;
-    font-size: 13px;
+    font-size: 12px;
+    color: #666;
+}
+
+.pagination-buttons {
+    display: flex;
+    gap: 5px;
 }
 
 .pagination-buttons a {
     display: inline-block;
-    padding: 4px 10px;
-    margin-left: 5px;
+    padding: 5px 10px;
     background-color: #4a6fa5;
     color: #ffffff;
     text-decoration: none;

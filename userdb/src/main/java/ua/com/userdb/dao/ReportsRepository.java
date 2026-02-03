@@ -195,4 +195,62 @@ public interface ReportsRepository extends JpaRepository<DBUser, Integer> {
         @Param("roleId") Integer roleId,
         @Param("expTo") LocalDate expTo
     );
+    
+    @Query("""
+    	    SELECT new ua.com.userdb.dto.ReportRowDto(
+    	        u.id,
+    	        u.identificationNumber,
+    	        u.name,
+    	        d.name,
+    	        u.isActive,
+    	        db.name,
+    	        dr.name,
+    	        null,
+    	        a.accessExpirationDate
+    	    )
+    	    FROM DBUserAccess a
+    	        JOIN a.dbUser u
+    	        JOIN u.department d
+    	        JOIN a.database db
+    	        LEFT JOIN DBUserRole ur
+    	            ON ur.dbUser = u
+    	        LEFT JOIN ur.databaseRole dr
+    	            ON dr.database = db
+    	    WHERE u.isActive = true
+    	      AND (a.isBlocked = false OR a.isBlocked IS NULL)
+    	      AND (:departmentId IS NULL OR d.id = :departmentId)
+    	""")
+    	List<ReportRowDto> findAccessesByDepartmentNoDate(
+    	    @Param("departmentId") Integer departmentId
+    	);
+
+    	@Query("""
+    	    SELECT new ua.com.userdb.dto.ReportRowDto(
+    	        u.id,
+    	        u.identificationNumber,
+    	        u.name,
+    	        d.name,
+    	        u.isActive,
+    	        db.name,
+    	        dr.name,
+    	        null,
+    	        a.accessExpirationDate
+    	    )
+    	    FROM DBUserAccess a
+    	        JOIN a.dbUser u
+    	        JOIN u.department d
+    	        JOIN a.database db
+    	        LEFT JOIN DBUserRole ur
+    	            ON ur.dbUser = u
+    	        LEFT JOIN ur.databaseRole dr
+    	            ON dr.database = db
+    	    WHERE u.isActive = true
+    	      AND (a.isBlocked = false OR a.isBlocked IS NULL)
+    	      AND (:departmentId IS NULL OR d.id = :departmentId)
+    	      AND a.accessExpirationDate <= :expTo
+    	""")
+    	List<ReportRowDto> findAccessesByDepartmentWithDate(
+    	    @Param("departmentId") Integer departmentId,
+    	    @Param("expTo") LocalDate expTo
+    	);
 }

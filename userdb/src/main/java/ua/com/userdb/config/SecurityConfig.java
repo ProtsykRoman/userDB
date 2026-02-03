@@ -14,25 +14,29 @@ import ua.com.userdb.security.CustomUserDetailsService;
 @Configuration
 public class SecurityConfig {
 	@Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll()
-            .anyRequest().authenticated()
-        )
-        .formLogin(form -> form
-        	    .loginPage("/login")
-        	    .defaultSuccessUrl("/home", true)
-        	    .failureUrl("/login?error=true")
-        	    .permitAll()
-        	)
-        .logout(logout -> logout
-            .logoutSuccessUrl("/login?logout")
-            .permitAll()
-        );
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	    http
+	        .authorizeHttpRequests(auth -> auth
+	            .requestMatchers("/login", "/register", "/error", "/css/**", "/js/**").permitAll()
+	            .anyRequest().authenticated()
+	        )
+	        .formLogin(form -> form
+	            .loginPage("/login")
+	            .defaultSuccessUrl("/home", true)
+	            .failureUrl("/login?error=true")
+	            .permitAll()
+	        )
+	        .logout(logout -> logout
+	            .logoutUrl("/logout")
+	            .logoutSuccessUrl("/login?logout")
+	            .invalidateHttpSession(true)
+	            .clearAuthentication(true)
+	            .permitAll()
+	        );
 
-    return http.build();
-    }
+	    return http.build();
+	}
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

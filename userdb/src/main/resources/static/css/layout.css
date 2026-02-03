@@ -11,11 +11,13 @@ body {
 .page-container {
     display: flex;
     min-height: 100vh;
+    width: 100%; /* Додано для стабільності */
 }
 
 /* === Меню зліва === */
 .sidebar {
     width: 200px;
+    flex-shrink: 0; 
     background-color: #ffffff;
     padding: 20px;
     box-shadow: 2px 0 8px rgba(0,0,0,0.1);
@@ -45,7 +47,9 @@ body {
     font-weight: 500;
     padding: 6px 12px;
     border-radius: 5px;
-    display: inline-block;
+    display: block;
+    width: 100%;
+    box-sizing: border-box; /* Додано для коректних відступів */
     transition: all 0.3s;
 }
 
@@ -70,6 +74,8 @@ body {
 /* === Контент справа === */
 .content {
     flex-grow: 1;
+    min-width: 0; 
+    overflow-x: auto; /* Додає прокрутку, якщо таблиця занадто широка */
     background: #f5f7fa;
     padding: 30px;
     box-sizing: border-box;
@@ -98,4 +104,30 @@ body {
 
 .content a:hover {
     color: #3a5c8e;
+}
+
+.sidebar ul li form {
+    margin: 0;
+}
+
+.sidebar ul li .logout-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4a6fa5;
+    padding: 6px 12px;
+    border-radius: 5px;
+    display: inline-block;
+    width: 100%;
+    text-align: left;
+    box-sizing: border-box;
+    transition: all 0.3s;
+}
+
+.sidebar ul li .logout-btn:hover {
+    background-color: #3a5c8e;
+    color: #ffffff;
 }
