@@ -205,12 +205,12 @@ public class DBUserController {
     	);
     	model.addAttribute("ranks", ranks);
     	
-    	List<Department> departments = mergeActiveWithSelected(
-    	        departmentService.findAll(),
+    	List<Department> hierarchy = mergeActiveWithSelected(
+    	        departmentService.getDepartmentsHierarchy(),
     	        dbUser.getDepartment(),
     	        Department::getIsActive
     	);
-        model.addAttribute("allDepartments", departments);
+    	model.addAttribute("allDepartments", hierarchy);
         
         Database selectedDatabase = dbUser.getDbUserAccesses().stream()
                 .map(DBUserAccess::getDatabase)

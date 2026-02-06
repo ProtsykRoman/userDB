@@ -1,184 +1,191 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layout}">
+      xmlns:layout="http://www.ultraq.net.nz"
+      layout:decorate="~{layout}">
 <head>
-<title layout:fragment="title">Звіти</title>
-<link rel="stylesheet" th:href="@{/css/reports.css}">
-
-<style>
-select:disabled {
-	background-color: #e0e0e0;
-	color: #666;
-	cursor: not-allowed;
-}
-</style>
-
-<script>
-        function toggleFilters() {
-            const cert = document.getElementById('certificateTypeId');
-            const db   = document.getElementById('databaseId');
-            const role = document.getElementById('databaseRoleId');
-
-            cert.disabled = false;
-            db.disabled = false;
-            role.disabled = false;
-
-            if (cert.value) {
-                db.disabled = true;
-                role.disabled = true;
-            } else if (db.value) {
-                cert.disabled = true;
-                role.disabled = true;
-            } else if (role.value) {
-                cert.disabled = true;
-                db.disabled = true;
-            }
+    <title layout:fragment="title">Звіти</title>
+    <link rel="stylesheet" th:href="@{/css/reports.css}">
+    <style>
+        /* Стиль для заблокованих полів (сірий колір та заборона кліку) */
+        select:disabled {
+            background-color: #e0e0e0 !important;
+            color: #666 !important;
+            cursor: not-allowed;
+            opacity: 0.7;
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            toggleFilters();
-
-            ['certificateTypeId', 'databaseId', 'databaseRoleId']
-                .forEach(id =>
-                    document.getElementById(id)
-                        .addEventListener('change', toggleFilters)
-                );
-
-            // 🔑 КЛЮЧОВЕ: перед submit знімаємо disabled
-            document.querySelector('form').addEventListener('submit', () => {
-                document
-                    .querySelectorAll('select:disabled')
-                    .forEach(s => s.disabled = false);
-            });
-        });
-    </script>
+    </style>
 </head>
 
 <body>
-	<div layout:fragment="content" class="form-container">
+<div layout:fragment="content" class="form-container">
+    <h2>Формування звітів</h2>
 
-		<h2>Формування звітів</h2>
+    <form th:action="@{/reports}" method="get" id="reportForm">
 
-		<form th:action="@{/reports}" method="get">
+        <!-- Перший рядок -->
+        <div class="form-row">
+            <div class="form-group">
+                <label>Область пошуку</label>
+                <select name="onlyDepartmentSelected" id="onlyDepartmentSelected">
+                    <option value="true" th:selected="${onlyDepartmentSelected == true}">Тільки вибраний</option>
+                    <option value="false" th:selected="${onlyDepartmentSelected == false}">Підпорядковані</option>
+                </select>
+            </div>
 
-			<div class="form-row">
+            <div class="form-group">
+                <label>Підрозділ</label>
+                <select name="departmentId" id="departmentId">
+                    <option value="">-- всі --</option>
+                    <option th:each="d : ${departments}" th:value="${d.id}"
+                            th:text="${'--'.repeat(d.level) + d.name}"
+                            th:selected="${departmentId == d.id}"></option>
+                </select>
+            </div>
 
-				<div class="form-group">
-					<label>Підрозділ</label> <select name="departmentId">
-						<option value="">-- всі --</option>
-						<option th:each="d : ${departments}" th:value="${d.id}"
-							th:text="${'--'.repeat(d.level) + d.name}"
-							th:selected="${departmentId == d.id}"></option>
-					</select>
-				</div>
+            <div class="form-group">
+                <label>Закінчення до</label>
+                <input type="date" name="expirationTo" id="expirationTo" th:value="${param.expirationTo}">
+            </div>
+        </div>
 
-				<div class="form-group">
-					<label>База даних</label> <select id="databaseId" name="databaseId">
-						<option value="">-- всі --</option>
-						<option th:each="db : ${databases}" th:value="${db.id}"
-							th:text="${db.name}" th:selected="${databaseId == db.id}">
-						</option>
-					</select>
-				</div>
+        <!-- Другий рядок (Взаємовиключні фільтри) -->
+        <div class="form-row">
+            <div class="form-group">
+                <label>Тип сертифікату</label>
+                <select id="certificateTypeId" name="certificateTypeId">
+                    <option value="">-- всі --</option>
+                    <option th:each="c : ${certificateTypes}" th:value="${c.id}"
+                            th:text="${c.name}" th:selected="${certificateTypeId == c.id}"></option>
+                </select>
+            </div>
 
-				<div class="form-group">
-					<label>Роль</label> <select id="databaseRoleId"
-						name="databaseRoleId">
-						<option value="">-- всі --</option>
-						<option th:each="r : ${databaseRoles}" th:value="${r.id}"
-							th:text="${r.name + ' (' + r.database.name + ')'}"
-							th:selected="${databaseRoleId == r.id}"></option>
-					</select>
-				</div>
+            <div class="form-group">
+                <label>База даних</label>
+                <select id="databaseId" name="databaseId">
+                    <option value="">-- всі --</option>
+                    <option th:each="db : ${databases}" th:value="${db.id}"
+                            th:text="${db.name}" th:selected="${databaseId == db.id}"></option>
+                </select>
+            </div>
 
-				<div class="form-group">
-					<label>Тип сертифікату</label> <select id="certificateTypeId"
-						name="certificateTypeId">
-						<option value="">-- всі --</option>
-						<option th:each="c : ${certificateTypes}" th:value="${c.id}"
-							th:text="${c.name}" th:selected="${certificateTypeId == c.id}">
-						</option>
-					</select>
-				</div>
+            <div class="form-group">
+                <label>Роль</label>
+                <select id="databaseRoleId" name="databaseRoleId">
+                    <option value="">-- всі --</option>
+                    <option th:each="r : ${databaseRoles}" th:value="${r.id}"
+                            th:text="${r.name + ' (' + r.database.name + ')'}"
+                            th:selected="${databaseRoleId == r.id}"></option>
+                </select>
+            </div>
+        </div>
 
-			</div>
+        <div class="form-buttons">
+            <button type="submit" class="btn-add">Показати</button>
+            <a th:href="@{/reports}" class="btn-cancel">Очистити</a>
+            <a class="btn-export-excel"
+               th:href="@{/reports/export(
+                   departmentId=${departmentId},
+                   onlyDepartmentSelected=${onlyDepartmentSelected},
+                   databaseId=${databaseId},
+                   databaseRoleId=${databaseRoleId},
+                   certificateTypeId=${certificateTypeId},
+                   expirationTo=${expirationTo}
+               )}">
+                Експорт в Excel
+            </a>
+        </div>
+    </form>
 
-			<div class="form-row">
-				<div class="form-group">
-					<label>Закінчення до</label> <input type="date" name="expirationTo"
-						th:value="${param.expirationTo}">
-				</div>
-			</div>
+    <div th:if="${report != null}">
+        <h3>Результати</h3>
+        <table class="list-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>ПІБ</th>
+                <th>Підрозділ</th>
+                <th>Активний</th>
+                <th>Тип</th>
+                <th>Деталі</th>
+                <th>Дата закінчення</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="row : ${report}">
+                <td th:text="${row.identificationNumber}"></td>
+                <td><a th:href="@{/dbusers/edit/{id}(id=${row.userId})}"
+                       th:text="${row.userName}"></a></td>
+                <td th:text="${row.departmentName}"></td>
+                <td th:text="${row.isActive ? 'Так' : 'Ні'}"></td>
+                <td th:text="${row.source}"></td>
+                <td>
+                    <span th:if="${row.source == T(ua.com.userdb.dto.ReportSourceType).CERTIFICATE}"
+                          th:text="${row.certificateTypeName}"></span>
+                    <span th:if="${row.source == T(ua.com.userdb.dto.ReportSourceType).ACCESS}"
+                          th:text="${row.databaseName + (row.databaseRoleName != null ? ' / ' + row.databaseRoleName : '')}"></span>
+                </td>
+                <td th:text="${row.expirationDate != null ? #temporals.format(row.expirationDate, 'yyyy-MM-dd') : ''}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-			<div class="form-buttons">
-				<button type="submit" class="btn-add">Показати</button>
-				<a th:href="@{/reports}" class="btn-cancel">Очистити</a> <a
-					class="btn-export-excel"
-					th:href="@{/reports/export(
-       departmentId=${departmentId},
-       databaseId=${databaseId},
-       databaseRoleId=${databaseRoleId},
-       certificateTypeId=${certificateTypeId},
-       expirationTo=${expirationTo}
-   )}">
-					Експорт в Excel </a>
-			</div>
+    <!-- Вбудований JavaScript для роботи фільтрів -->
+    <script th:inline="javascript">
+    (function() {
+        const initFilterLogic = function() {
+            const cert = document.getElementById('certificateTypeId');
+            const db   = document.getElementById('databaseId');
+            const role = document.getElementById('databaseRoleId');
+            const form = document.getElementById('reportForm');
 
-		</form>
+            if (!cert || !db || !role) return;
 
-		<div th:if="${report != null}">
-			<h3>Результати</h3>
+            function toggleFilters() {
+                // Спочатку все розблоковуємо
+                cert.disabled = false;
+                db.disabled   = false;
+                role.disabled = false;
 
-			<table class="list-table">
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>ПІБ</th>
-						<th>Підрозділ</th>
-						<th>Активний</th>
-						<th>Тип</th>
-						<th>Деталі</th>
-						<th>Дата закінчення</th>
-					</tr>
-				</thead>
+                // Блокуємо решту, якщо вибрано конкретне значення
+                if (cert.value && cert.value !== "") {
+                    db.disabled = true;
+                    role.disabled = true;
+                } else if (db.value && db.value !== "") {
+                    cert.disabled = true;
+                    role.disabled = true;
+                } else if (role.value && role.value !== "") {
+                    cert.disabled = true;
+                    db.disabled   = true;
+                }
+            }
 
-				<tbody>
-					<tr th:each="row : ${report}">
-						<td th:text="${row.identificationNumber}"></td>
-						<td><a th:href="@{/dbusers/edit/{id}(id=${row.userId})}"
-							th:text="${row.userName}"> </a></td>
-						<td th:text="${row.departmentName}"></td>
-						<td th:text="${row.isActive ? 'Так' : 'Ні'}"></td>
-						<td th:text="${row.source}"></td>
-						<td><span
-							th:if="${row.source == T(ua.com.userdb.dto.ReportSourceType).CERTIFICATE}"
-							th:text="${row.certificateTypeName}"></span> <span
-							th:if="${row.source == T(ua.com.userdb.dto.ReportSourceType).ACCESS}"
-							th:text="${row.databaseName + (row.databaseRoleName != null ? ' / ' + row.databaseRoleName : '')}">
-						</span></td>
-						<td
-							th:text="${row.expirationDate != null ? #temporals.format(row.expirationDate, 'yyyy-MM-dd') : ''}"></td>
-					</tr>
-				</tbody>
-			</table>
+            // Додаємо слухачі на миттєву зміну (change)
+            cert.addEventListener('change', toggleFilters);
+            db.addEventListener('change', toggleFilters);
+            role.addEventListener('change', toggleFilters);
 
-			<div class="pagination">
-				<span
-					th:text="'Записи ' + (${currentPage}-1)*${pageSize}+1 + ' - ' + (${currentPage}-1)*${pageSize} + ${report.size()} + ' з ' + ${totalRecords}"></span>
+            // Викликаємо одразу для підтримки значень після перезавантаження (Thymeleaf)
+            toggleFilters();
 
-				<div class="pagination-buttons">
-					<a th:if="${currentPage > 1}"
-						th:href="@{/reports(departmentId=${departmentId}, databaseId=${databaseId}, databaseRoleId=${databaseRoleId}, certificateTypeId=${certificateTypeId}, expirationTo=${expirationTo}, page=${currentPage - 1}, size=${pageSize})}">&laquo;
-						Назад</a> <a th:if="${currentPage < totalPages}"
-						th:href="@{/reports(departmentId=${departmentId}, databaseId=${databaseId}, databaseRoleId=${databaseRoleId}, certificateTypeId=${certificateTypeId}, expirationTo=${expirationTo}, page=${currentPage + 1}, size=${pageSize})}">Вперед
-						&raquo;</a>
-				</div>
-			</div>
-		</div>
+            // Перед відправкою форми (submit) розблокувати все, щоб Spring отримав дані
+            if (form) {
+                form.addEventListener('submit', function() {
+                    cert.disabled = false;
+                    db.disabled   = false;
+                    role.disabled = false;
+                });
+            }
+        };
 
-
-
-	</div>
+        // Гарантований запуск після готовності DOM
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initFilterLogic);
+        } else {
+            initFilterLogic();
+        }
+    })();
+    </script>
+</div>
 </body>
 </html>

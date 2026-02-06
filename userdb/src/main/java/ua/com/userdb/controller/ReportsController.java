@@ -7,9 +7,7 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletResponse;
 import ua.com.userdb.dto.ReportFilter;
@@ -51,31 +49,28 @@ public class ReportsController {
             @RequestParam(required = false) Integer databaseId,
             @RequestParam(required = false) Integer databaseRoleId,
             @RequestParam(required = false) Integer certificateTypeId,
+            @RequestParam(required = false) Boolean onlyDepartmentSelected,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationTo,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
             Model model
     ) {
+        // нормалізація значень
         if (databaseId != null && databaseId <= 0) databaseId = null;
         if (databaseRoleId != null && databaseRoleId <= 0) databaseRoleId = null;
         if (certificateTypeId != null && certificateTypeId <= 0) certificateTypeId = null;
 
-        boolean onlyDepartmentSelected =
-                departmentId != null &&
-                databaseId == null &&
-                databaseRoleId == null &&
-                certificateTypeId == null;
-
-        if (!onlyDepartmentSelected) {
-            if (databaseRoleId != null) {
-                databaseId = null;
-                certificateTypeId = null;
-            } else if (databaseId != null) {
-                certificateTypeId = null;
-            }
+        // якщо параметр не переданий, визначаємо його автоматично
+        if (onlyDepartmentSelected == null) {
+            onlyDepartmentSelected =
+                    departmentId != null &&
+                    databaseId == null &&
+                    databaseRoleId == null &&
+                    certificateTypeId == null;
         }
 
+        // додаємо атрибути для фільтрів у модель
         model.addAttribute("departments", departmentService.getDepartmentsHierarchy());
         model.addAttribute("databases", databaseService.findAllDatabase());
         model.addAttribute("databaseRoles", databaseRoleService.findAllDatabaseRole());
@@ -85,6 +80,7 @@ public class ReportsController {
         model.addAttribute("databaseId", databaseId);
         model.addAttribute("databaseRoleId", databaseRoleId);
         model.addAttribute("certificateTypeId", certificateTypeId);
+        model.addAttribute("onlyDepartmentSelected", onlyDepartmentSelected);
 
         boolean filtersUsed =
                 departmentId != null ||
@@ -127,25 +123,22 @@ public class ReportsController {
             @RequestParam(required = false) Integer databaseId,
             @RequestParam(required = false) Integer databaseRoleId,
             @RequestParam(required = false) Integer certificateTypeId,
+            @RequestParam(required = false) Boolean onlyDepartmentSelected,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationTo,
             HttpServletResponse response
     ) throws IOException {
 
-        boolean onlyDepartmentSelected =
-                departmentId != null &&
-                databaseId == null &&
-                databaseRoleId == null &&
-                certificateTypeId == null;
+        if (databaseId != null && databaseId <= 0) databaseId = null;
+        if (databaseRoleId != null && databaseRoleId <= 0) databaseRoleId = null;
+        if (certificateTypeId != null && certificateTypeId <= 0) certificateTypeId = null;
 
-        // Виправляємо пріоритет фільтрів
-        if (!onlyDepartmentSelected) {
-            if (databaseRoleId != null) {
-                databaseId = null;
-                certificateTypeId = null;
-            } else if (databaseId != null) {
-                certificateTypeId = null;
-            }
+        if (onlyDepartmentSelected == null) {
+            onlyDepartmentSelected =
+                    departmentId != null &&
+                    databaseId == null &&
+                    databaseRoleId == null &&
+                    certificateTypeId == null;
         }
 
         ReportFilter filter = new ReportFilter();
@@ -166,17 +159,6 @@ public class ReportsController {
                 "attachment; filename=report.xlsx"
         );
 
-        if (certificateTypeId != null) {
-            // Вибрані сертифікати — колонка є
-            ReportExcelWriter.writeCertificates(report, response.getOutputStream());
-        } else if (onlyDepartmentSelected) {
-            // Вибрано лише підрозділ — не показуємо колонку сертифікатів
-            boolean showCertificateColumn = false;
-            ReportExcelWriter.writeAccessesAndCertificates(report, response.getOutputStream(), showCertificateColumn);
-        } else {
-            // Вибрано доступи (бази/ролі) — колонка сертифікатів не показуємо
-            ReportExcelWriter.writeAccesses(report, response.getOutputStream());
-        }
+        ReportExcelWriter.writeReport(report, response.getOutputStream(), onlyDepartmentSelected, certificateTypeId != null);
     }
-
 }

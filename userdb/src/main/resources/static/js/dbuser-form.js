@@ -1,104 +1,58 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // 1. Отримуємо посилання на елементи
+    const cert = document.getElementById('certificateTypeId');
+    const db   = document.getElementById('databaseId');
+    const role = document.getElementById('databaseRoleId');
+    const form = document.querySelector('form');
 
-    // --- Доступи ---
-    const accessBody = document.getElementById('accessBody');
-    const addAccessBtn = document.getElementById('addAccessBtn');
+    const allSelectors = [cert, db, role];
 
-    addAccessBtn?.addEventListener('click', () => {
-        const index = accessBody.querySelectorAll('tr').length;
-        const tr = document.createElement('tr');
+    /**
+     * Функція логіки блокування
+     */
+    function toggleFilters() {
+        // Перевіряємо, чи всі елементи існують на сторінці
+        if (!cert || !db || !role) return;
 
-        const options = databases.map(db => `<option value="${db.id}">${db.name}</option>`).join('');
+        // Знаходимо селект, у якого вибрано значення (не порожнє)
+        const activeSelect = allSelectors.find(select => select.value !== "");
 
-        tr.innerHTML = `
-            <td>
-                <input type="hidden" name="dbUserAccesses[${index}].id" />
-                <select name="dbUserAccesses[${index}].database.id" required>
-                    <option value="">-- Виберіть базу даних --</option>${options}
-                </select>
-            </td>
-            <td>
-                <input type="date" name="dbUserAccesses[${index}].accessExpirationDate" />
-            </td>
-            <td>
-                <button type="button" class="btn-delete">Видалити</button>
-            </td>
-        `;
-        tr.querySelector('.btn-delete').addEventListener('click', () => removeAccessRow(tr));
-        accessBody.appendChild(tr);
+        if (activeSelect) {
+            // Якщо щось вибрано — блокуємо всі інші, крім активного
+            allSelectors.forEach(select => {
+                if (select !== activeSelect) {
+                    select.disabled = true;
+                } else {
+                    select.disabled = false;
+                }
+            });
+        } else {
+            // Якщо нічого не вибрано — розблокуємо все
+            allSelectors.forEach(select => {
+                select.disabled = false;
+            });
+        }
+    }
+
+    // 2. Навішуємо слухачі подій на кожну зміну
+    allSelectors.forEach(select => {
+        if (select) {
+            select.addEventListener('change', toggleFilters);
+        }
     });
 
-    // --- Ролі ---
-    const roleBody = document.getElementById('roleBody');
-    const addRoleBtn = document.getElementById('addRoleBtn');
+    // 3. Викликаємо функцію одразу при завантаженні 
+    // (потрібно, якщо сторінка відкрилася вже з вибраними фільтрами від Thymeleaf)
+    toggleFilters();
 
-    addRoleBtn?.addEventListener('click', () => {
-        const index = roleBody.querySelectorAll('tr').length;
-        const tr = document.createElement('tr');
-        const options = databaseRoles.map(r => `<option value="${r.id}">${r.name} (${r.database.name})</option>`).join('');
-
-        tr.innerHTML = `
-            <td>
-                <input type="hidden" name="dbUserRoles[${index}].id" />
-                <select name="dbUserRoles[${index}].databaseRole.id" required>
-                    <option value="">-- Виберіть роль --</option>${options}
-                </select>
-            </td>
-            <td><button type="button" class="btn-delete">Видалити</button></td>
-        `;
-        tr.querySelector('.btn-delete').addEventListener('click', () => removeRoleRow(tr));
-        roleBody.appendChild(tr);
-    });
-
-    // --- Сертифікати ---
-    const certBody = document.getElementById('certBody');
-    const addCertBtn = document.getElementById('addCertBtn');
-
-    addCertBtn?.addEventListener('click', () => {
-        const index = certBody.querySelectorAll('tr').length;
-        const tr = document.createElement('tr');
-        const options = certificateTypes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-
-        tr.innerHTML = `
-            <td>
-                <input type="hidden" name="dbUserCertificates[${index}].id" />
-                <select name="dbUserCertificates[${index}].certificateType.id" required>
-                    <option value="">-- Виберіть тип сертифіката --</option>${options}
-                </select>
-            </td>
-            <td><input type="text" name="dbUserCertificates[${index}].number"/></td>
-            <td><input type="date" name="dbUserCertificates[${index}].expirationDate"/></td>
-            <td><input type="checkbox" name="dbUserCertificates[${index}].isBlocked"/></td>
-            <td><button type="button" class="btn-delete">Видалити</button></td>
-        `;
-        tr.querySelector('.btn-delete').addEventListener('click', () => removeCertRow(tr));
-        certBody.appendChild(tr);
-    });
-});
-
-// --- Функції видалення ---
-function removeAccessRow(tr) {
-    tr.remove();
-    updateIndices('accessBody', 'dbUserAccesses');
-}
-
-function removeRoleRow(tr) {
-    tr.remove();
-    updateIndices('roleBody', 'dbUserRoles');
-}
-
-function removeCertRow(tr) {
-    tr.remove();
-    updateIndices('certBody', 'dbUserCertificates');
-}
-
-// --- Оновлення індексів ---
-function updateIndices(tbodyId, arrayName) {
-    const tbody = document.getElementById(tbodyId);
-    Array.from(tbody.querySelectorAll('tr')).forEach((tr, idx) => {
-        tr.querySelectorAll('input, select').forEach(el => {
-            const name = el.getAttribute('name');
-            if (name) el.setAttribute('name', name.replace(/\[\d+\]/, `[${idx}]`));
+    // 4. ВАЖЛИВО: Перед відправкою форми розблоковуємо поля.
+    // Заблоковані (disabled) поля браузер не відправляє на сервер, 
+    // тому їх треба "включити" за мілісекунду до відправки.
+    if (form) {
+        form.addEventListener('submit', function() {
+            allSelectors.forEach(select => {
+                if (select) select.disabled = false;
+            });
         });
-    });
-}
+    }
+});

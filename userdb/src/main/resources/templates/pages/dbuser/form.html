@@ -55,23 +55,26 @@
 
 				<div class="form-group">
 					<label for="department">Підрозділ:</label> <select id="department"
-						th:field="*{department.id}" required>
+						th:name="department.id" required>
 						<option th:value="0" th:text="'--- Виберіть підрозділ ---'"
 							th:selected="${dbUser.department == null || dbUser.department.id == 0}">
 						</option>
 						<option th:each="dept : ${allDepartments}" th:value="${dept.id}"
-							th:selected="${dbUser.department != null} ? ${dept.id} == ${dbUser.department.id} : false"
-							th:text="${'--'.repeat(dept.level) + dept.name}"></option>
+							th:text="${'--'.repeat(dept.level) + dept.name}"
+							th:selected="${dbUser.department != null} ? ${dept.id} == ${dbUser.department.id} : false">
+						</option>
 					</select>
 				</div>
+
+
 
 			</div>
 
 			<!-- Таблиця сертифікатів -->
 			<div class="table-header">
-    <h3>Сертифікати користувача</h3>
-    <button type="button" class="btn-add" id="addCertBtn">Додати</button>
-</div>
+				<h3>Сертифікати користувача</h3>
+				<button type="button" class="btn-add" id="addCertBtn">Додати</button>
+			</div>
 			<table id="certTable" class="data-table">
 				<thead>
 					<tr>
@@ -111,9 +114,9 @@
 
 			<!-- Таблиця доступів -->
 			<div class="table-header">
-    <h3>Доступи до баз даних</h3>
-    <button type="button" class="btn-add" id="addAccessBtn">Додати</button>
-</div>
+				<h3>Доступи до баз даних</h3>
+				<button type="button" class="btn-add" id="addAccessBtn">Додати</button>
+			</div>
 			<table id="accessTable" class="data-table">
 				<thead>
 					<tr>
@@ -145,9 +148,9 @@
 
 			<!-- Таблиця ролей -->
 			<div class="table-header">
-    <h3>Ролі користувача</h3>
-    <button type="button" class="btn-add" id="addRoleBtn">Додати</button>
-</div>
+				<h3>Ролі користувача</h3>
+				<button type="button" class="btn-add" id="addRoleBtn">Додати</button>
+			</div>
 			<table id="roleTable" class="data-table">
 				<thead>
 					<tr>

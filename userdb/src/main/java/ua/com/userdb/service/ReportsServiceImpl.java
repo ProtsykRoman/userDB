@@ -8,6 +8,7 @@ import ua.com.userdb.dto.ReportSourceType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -17,9 +18,11 @@ import java.util.List;
 public class ReportsServiceImpl implements ReportsService {
 
     private final ReportsRepository reportsRepository;
+    private final DepartmentService departmentService;
 
-    public ReportsServiceImpl(ReportsRepository reportsRepository) {
+    public ReportsServiceImpl(ReportsRepository reportsRepository, DepartmentService departmentService) {
         this.reportsRepository = reportsRepository;
+        this.departmentService = departmentService;
     }
 
     @Override
@@ -28,80 +31,64 @@ public class ReportsServiceImpl implements ReportsService {
         List<ReportRowDto> result = new ArrayList<>();
         boolean hasDate = filter.getExpirationTo() != null;
 
+        // ================= ПІДРОЗДІЛИ =================
+        List<Integer> departmentIds = null;
+        if (filter.getDepartmentId() != null) {
+            if (filter.isOnlyDepartmentSelected()) {
+                // тільки обраний
+                departmentIds = List.of(filter.getDepartmentId());
+            } else {
+                // всі підпідрозділи
+                departmentIds = departmentService.getSubDepartmentIds(filter.getDepartmentId());
+            }
+        }
+
         // ================= CERTIFICATES =================
         if (filter.getCertificateTypeId() != null) {
             var rows = hasDate
-                    ? reportsRepository.findCertificatesWithDate(
-                            filter.getDepartmentId(),
-                            filter.getCertificateTypeId(),
-                            filter.getExpirationTo())
-                    : reportsRepository.findCertificatesNoDate(
-                            filter.getDepartmentId(),
-                            filter.getCertificateTypeId());
+                    ? reportsRepository.findCertificatesWithDate(departmentIds, filter.getCertificateTypeId(), filter.getExpirationTo())
+                    : reportsRepository.findCertificatesNoDate(departmentIds, filter.getCertificateTypeId());
 
-            rows.forEach(r ->
-                    result.add(new ReportRowDto(r, ReportSourceType.CERTIFICATE))
-            );
+            rows.forEach(r -> result.add(new ReportRowDto(r, ReportSourceType.CERTIFICATE)));
             return sort(result);
         }
 
         // ================= ACCESS BY ROLE =================
         if (filter.getDatabaseRoleId() != null) {
             var rows = hasDate
-                    ? reportsRepository.findAccessesByRoleWithDate(
-                            filter.getDepartmentId(),
-                            filter.getDatabaseRoleId(),
-                            filter.getExpirationTo())
-                    : reportsRepository.findAccessesByRoleNoDate(
-                            filter.getDepartmentId(),
-                            filter.getDatabaseRoleId());
+                    ? reportsRepository.findAccessesByRoleWithDate(departmentIds, filter.getDatabaseRoleId(), filter.getExpirationTo())
+                    : reportsRepository.findAccessesByRoleNoDate(departmentIds, filter.getDatabaseRoleId());
 
-            rows.forEach(r ->
-                    result.add(new ReportRowDto(r, ReportSourceType.ACCESS))
-            );
+            rows.forEach(r -> result.add(new ReportRowDto(r, ReportSourceType.ACCESS)));
             return sort(result);
         }
 
         // ================= ACCESS BY DATABASE =================
         if (filter.getDatabaseId() != null) {
             var rows = hasDate
-                    ? reportsRepository.findAccessesByDatabaseWithDate(
-                            filter.getDepartmentId(),
-                            filter.getDatabaseId(),
-                            filter.getExpirationTo())
-                    : reportsRepository.findAccessesByDatabaseNoDate(
-                            filter.getDepartmentId(),
-                            filter.getDatabaseId());
+                    ? reportsRepository.findAccessesByDatabaseWithDate(departmentIds, filter.getDatabaseId(), filter.getExpirationTo())
+                    : reportsRepository.findAccessesByDatabaseNoDate(departmentIds, filter.getDatabaseId());
 
-            rows.forEach(r ->
-                    result.add(new ReportRowDto(r, ReportSourceType.ACCESS))
-            );
+            rows.forEach(r -> result.add(new ReportRowDto(r, ReportSourceType.ACCESS)));
             return sort(result);
         }
 
-        // ================= ONLY DEPARTMENT =================
-        if (filter.isOnlyDepartmentSelected()) {
+        // ================= ONLY DEPARTMENT / ПІДРОЗДІЛИ =================
+        if (departmentIds != null) {
             var rows = hasDate
-                ? reportsRepository.findAccessesByDepartmentWithDate(filter.getDepartmentId(), filter.getExpirationTo())
-                : reportsRepository.findAccessesByDepartmentNoDate(filter.getDepartmentId());
+                    ? reportsRepository.findAccessesByDepartmentsWithDate(departmentIds, filter.getExpirationTo())
+                    : reportsRepository.findAccessesByDepartmentsNoDate(departmentIds);
+
             rows.forEach(r -> result.add(new ReportRowDto(r, ReportSourceType.ACCESS)));
             return sort(result);
         }
 
         // ================= DEFAULT: CERTIFICATES =================
         var rows = hasDate
-                ? reportsRepository.findCertificatesWithDate(
-                        filter.getDepartmentId(),
-                        null,
-                        filter.getExpirationTo())
-                : reportsRepository.findCertificatesNoDate(
-                        filter.getDepartmentId(),
-                        null);
+                ? reportsRepository.findCertificatesWithDate(departmentIds, null, filter.getExpirationTo())
+                : reportsRepository.findCertificatesNoDate(departmentIds, null);
 
-        rows.forEach(r ->
-                result.add(new ReportRowDto(r, ReportSourceType.CERTIFICATE))
-        );
-
+        rows.forEach(r -> result.add(new ReportRowDto(r, ReportSourceType.CERTIFICATE)));
         return sort(result);
     }
 
