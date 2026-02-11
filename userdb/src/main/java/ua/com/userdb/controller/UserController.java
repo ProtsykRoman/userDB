@@ -66,7 +66,7 @@ public class UserController {
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
             model.addAttribute("error", "Пароль обов'язковий");
             model.addAttribute("user", user);
-            model.addAttribute("departments", departmentService.findAll());
+            model.addAttribute("allDepartments", departmentService.getDepartmentsHierarchy());
             model.addAttribute("roles", Role.values());
             return "pages/users/form";
         }
@@ -83,30 +83,26 @@ public class UserController {
         User existing = userService.findUserById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Користувач не знайдений"));
 
-        existing.setUsername(user.getUsername());
-        existing.setRole(user.getRole());
-        existing.setIsActive(user.getIsActive());
-        existing.setDepartment(user.getDepartment());
-
         if (user.isChangePassword()) {
             // Перевірка старого пароля
             if (!passwordEncoder.matches(user.getOldPassword(), existing.getPassword())) {
                 model.addAttribute("error", "Старий пароль неправильний");
-                model.addAttribute("user", user);
-                model.addAttribute("departments", departmentService.findAll());
-                model.addAttribute("roles", Role.values());
+                prepareModelForError(model, user);
                 return "pages/users/form";
             }
             // Перевірка нового пароля і підтвердження
-            if (!user.getNewPassword().equals(user.getConfirmPassword())) {
+            if (user.getNewPassword() == null || !user.getNewPassword().equals(user.getConfirmPassword())) {
                 model.addAttribute("error", "Новий пароль і підтвердження не збігаються");
-                model.addAttribute("user", user);
-                model.addAttribute("departments", departmentService.findAll());
-                model.addAttribute("roles", Role.values());
+                prepareModelForError(model, user);
                 return "pages/users/form";
             }
             existing.setPassword(passwordEncoder.encode(user.getNewPassword()));
         }
+
+        existing.setUsername(user.getUsername());
+        existing.setRole(user.getRole());
+        existing.setIsActive(user.getIsActive());
+        existing.setDepartment(user.getDepartment());
 
         userService.createUser(existing);
         return "redirect:/users";
@@ -117,5 +113,11 @@ public class UserController {
     public String deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
         return "redirect:/users";
+    }
+    
+    private void prepareModelForError(Model model, User user) {
+        model.addAttribute("user", user);
+        model.addAttribute("allDepartments", departmentService.getDepartmentsHierarchy());
+        model.addAttribute("roles", Role.values());
     }
 }
