@@ -1,57 +1,97 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. Отримуємо посилання на елементи
-    const cert = document.getElementById('certificateTypeId');
-    const db   = document.getElementById('databaseId');
-    const role = document.getElementById('databaseRoleId');
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('form');
 
-    const allSelectors = [cert, db, role];
+    // --- 1. Додавання ДОСТУПІВ ---
+    document.getElementById('addAccessBtn')?.addEventListener('click', () => {
+        const body = document.getElementById('accessBody');
+        const index = body.querySelectorAll('tr').length;
+        const tr = document.createElement('tr');
+        const options = databases.map(db => `<option value="${db.id}">${db.name}</option>`).join('');
 
-    /**
-     * Функція логіки блокування
-     */
-    function toggleFilters() {
-        // Перевіряємо, чи всі елементи існують на сторінці
-        if (!cert || !db || !role) return;
-
-        // Знаходимо селект, у якого вибрано значення (не порожнє)
-        const activeSelect = allSelectors.find(select => select.value !== "");
-
-        if (activeSelect) {
-            // Якщо щось вибрано — блокуємо всі інші, крім активного
-            allSelectors.forEach(select => {
-                if (select !== activeSelect) {
-                    select.disabled = true;
-                } else {
-                    select.disabled = false;
-                }
-            });
-        } else {
-            // Якщо нічого не вибрано — розблокуємо все
-            allSelectors.forEach(select => {
-                select.disabled = false;
-            });
-        }
-    }
-
-    // 2. Навішуємо слухачі подій на кожну зміну
-    allSelectors.forEach(select => {
-        if (select) {
-            select.addEventListener('change', toggleFilters);
-        }
+        tr.innerHTML = `
+            <td>
+                <input type="hidden" name="dbUserAccesses[${index}].id" />
+                <select name="dbUserAccesses[${index}].database.id" required>
+                    <option value="">-- Виберіть базу даних --</option>${options}
+                </select>
+            </td>
+            <td><input type="date" name="dbUserAccesses[${index}].accessExpirationDate" /></td>
+            <td class="action-cell"><button type="button" class="btn-delete" onclick="removeAccessRow(this)">Видалити</button></td>
+        `;
+        body.appendChild(tr);
     });
 
-    // 3. Викликаємо функцію одразу при завантаженні 
-    // (потрібно, якщо сторінка відкрилася вже з вибраними фільтрами від Thymeleaf)
-    toggleFilters();
+    // --- 2. Додавання РОЛЕЙ ---
+    document.getElementById('addRoleBtn')?.addEventListener('click', () => {
+        const body = document.getElementById('roleBody');
+        const index = body.querySelectorAll('tr').length;
+        const tr = document.createElement('tr');
+        const options = databaseRoles.map(r => `<option value="${r.id}">${r.name} (${r.database.name})</option>`).join('');
 
-    // 4. ВАЖЛИВО: Перед відправкою форми розблоковуємо поля.
-    // Заблоковані (disabled) поля браузер не відправляє на сервер, 
-    // тому їх треба "включити" за мілісекунду до відправки.
-    if (form) {
-        form.addEventListener('submit', function() {
-            allSelectors.forEach(select => {
-                if (select) select.disabled = false;
+        tr.innerHTML = `
+            <td>
+                <input type="hidden" name="dbUserRoles[${index}].id" />
+                <select name="dbUserRoles[${index}].databaseRole.id" required>
+                    <option value="">-- Виберіть роль --</option>${options}
+                </select>
+            </td>
+            <td class="action-cell"><button type="button" class="btn-delete" onclick="removeRoleRow(this)">Видалити</button></td>
+        `;
+        body.appendChild(tr);
+    });
+
+    // --- 3. Додавання СЕРТИФІКАТІВ ---
+    document.getElementById('addCertBtn')?.addEventListener('click', () => {
+        const body = document.getElementById('certBody');
+        const index = body.querySelectorAll('tr').length;
+        const tr = document.createElement('tr');
+        const options = certificateTypes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+        tr.innerHTML = `
+            <td>
+                <input type="hidden" name="dbUserCertificates[${index}].id" />
+                <select name="dbUserCertificates[${index}].certificateType.id" required>
+                    <option value="">-- Виберіть тип сертифіката --</option>${options}
+                </select>
+            </td>
+            <td><input type="text" name="dbUserCertificates[${index}].number"/></td>
+            <td><input type="date" name="dbUserCertificates[${index}].expirationDate"/></td>
+            <td><input type="checkbox" name="dbUserCertificates[${index}].blocked"/></td>
+            <td class="action-cell"><button type="button" class="btn-delete" onclick="removeCertRow(this)">Видалити</button></td>
+        `;
+        body.appendChild(tr);
+    });
+
+    // --- 4. Глобальні функції видалення (викликаються з HTML onclick) ---
+    window.removeAccessRow = function(btn) {
+        btn.closest('tr').remove();
+    };
+
+    window.removeRoleRow = function(btn) {
+        btn.closest('tr').remove();
+    };
+
+    window.removeCertRow = function(btn) {
+        btn.closest('tr').remove();
+    };
+
+    // --- 5. Перерахунок індексів перед відправкою (Магія для Spring) ---
+    form?.addEventListener('submit', function () {
+        reindexTable('accessBody', 'dbUserAccesses');
+        reindexTable('roleBody', 'dbUserRoles');
+        reindexTable('certBody', 'dbUserCertificates');
+    });
+
+    function reindexTable(bodyId, arrayName) {
+        const rows = document.querySelectorAll(`#${bodyId} tr`);
+        rows.forEach((tr, index) => {
+            tr.querySelectorAll('input, select').forEach(el => {
+                const name = el.getAttribute('name');
+                if (name) {
+                    // Замінює будь-яке [число] на поточний порядковий номер [index]
+                    const newName = name.replace(/\[\d+\]/, `[${index}]`);
+                    el.setAttribute('name', newName);
+                }
             });
         });
     }

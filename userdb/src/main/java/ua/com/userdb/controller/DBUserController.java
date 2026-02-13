@@ -171,8 +171,8 @@ public class DBUserController {
     	Optional<DBUser> existing = dbUserService.findById(id);
 
         if (existing.isPresent()) {
-            Integer oldNumber = existing.get().getIdentificationNumber();
-            Integer newNumber = dbUser.getIdentificationNumber();
+            Long oldNumber = existing.get().getIdentificationNumber();
+            Long newNumber = dbUser.getIdentificationNumber();
 
             if (newNumber != null &&
                 !Objects.equals(oldNumber, newNumber) &&

@@ -8,6 +8,6 @@ import ua.com.userdb.model.DBUser;
 
 public interface DBUserRepository extends JpaRepository<DBUser, Integer>{
 	Optional<DBUser> findByName(String name);
-	Optional<DBUser> findByIdentificationNumber(Integer identificationNumber);
-    boolean existsByIdentificationNumber(Integer identificationNumber);
+	Optional<DBUser> findByIdentificationNumber(Long identificationNumber);
+    boolean existsByIdentificationNumber(Long identificationNumber);
 }

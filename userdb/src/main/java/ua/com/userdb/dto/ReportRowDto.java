@@ -13,7 +13,7 @@ import lombok.Setter;
 public class ReportRowDto {
 
 	private Integer userId;
-    private Integer identificationNumber;
+    private Long identificationNumber;
     private String userName;
     private String departmentName;
     private Boolean isActive;
@@ -28,7 +28,7 @@ public class ReportRowDto {
     // JPQL constructor
     public ReportRowDto(
     		Integer userId,
-            Integer identificationNumber,
+            Long identificationNumber,
             String userName,
             String departmentName,
             Boolean isActive,

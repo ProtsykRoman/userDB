@@ -14,5 +14,5 @@ public interface DBUserService {
 
     boolean deleteDBUser(Integer id);
     
-    boolean existsByIdentificationNumber(Integer identificationNumber);
+    boolean existsByIdentificationNumber(Long identificationNumber);
 }

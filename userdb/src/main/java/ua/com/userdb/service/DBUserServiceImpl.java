@@ -99,7 +99,7 @@ public class DBUserServiceImpl implements DBUserService {
 	}
 	
 	@Override
-	public boolean existsByIdentificationNumber(Integer identificationNumber) {
+	public boolean existsByIdentificationNumber(Long identificationNumber) {
 	    return dbUserRepository.existsByIdentificationNumber(identificationNumber);
 	}
 

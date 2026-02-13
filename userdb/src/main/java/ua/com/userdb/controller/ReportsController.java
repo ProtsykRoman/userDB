@@ -124,23 +124,23 @@ public class ReportsController {
             @RequestParam(required = false) Integer databaseRoleId,
             @RequestParam(required = false) Integer certificateTypeId,
             @RequestParam(required = false) Boolean onlyDepartmentSelected,
-            @RequestParam(required = false)
+            @RequestParam(required = false) 
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationTo,
             HttpServletResponse response
     ) throws IOException {
 
+        // 1. Нормалізація значень (прибираємо "всі", якщо прийшло 0 або -1)
         if (databaseId != null && databaseId <= 0) databaseId = null;
         if (databaseRoleId != null && databaseRoleId <= 0) databaseRoleId = null;
         if (certificateTypeId != null && certificateTypeId <= 0) certificateTypeId = null;
 
+        // 2. Визначення логіки області пошуку (як у методі звіту)
         if (onlyDepartmentSelected == null) {
-            onlyDepartmentSelected =
-                    departmentId != null &&
-                    databaseId == null &&
-                    databaseRoleId == null &&
-                    certificateTypeId == null;
+            onlyDepartmentSelected = (departmentId != null && databaseId == null && 
+                                     databaseRoleId == null && certificateTypeId == null);
         }
 
+        // 3. Підготовка фільтра для отримання даних
         ReportFilter filter = new ReportFilter();
         filter.setDepartmentId(departmentId);
         filter.setDatabaseId(databaseId);
@@ -149,16 +149,29 @@ public class ReportsController {
         filter.setExpirationTo(expirationTo);
         filter.setOnlyDepartmentSelected(onlyDepartmentSelected);
 
+        // 4. Отримання даних із сервісу
         List<ReportRowDto> report = reportsService.getReport(filter);
 
-        response.setContentType(
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        );
-        response.setHeader(
-                "Content-Disposition",
-                "attachment; filename=report.xlsx"
-        );
+        // 5. ЛОГІКА ДИНАМІЧНИХ КОЛОНОК ДЛЯ EXCEL
+        // Показуємо Базу та Роль, якщо вибрано хоча б один із цих фільтрів
+        boolean showDbAndRole = (databaseId != null || databaseRoleId != null);
+        
+        // Показуємо Сертифікат, якщо вибрано його фільтр 
+        // АБО якщо взагалі нічого не вибрано (бо сервіс за дефолтом вертає сертифікати)
+        boolean showCert = (certificateTypeId != null) || (!showDbAndRole && certificateTypeId == null);
 
-        ReportExcelWriter.writeReport(report, response.getOutputStream(), onlyDepartmentSelected, certificateTypeId != null);
+        // 6. Налаштування HTTP-відповіді
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=report_" + LocalDate.now() + ".xlsx");
+
+        // 7. Виклик врайтера з нашими параметрами
+        // Параметри відповідно до підпису методу: (rows, outputStream, includeAccess, includeCert)
+        ReportExcelWriter.writeReport(
+                report, 
+                response.getOutputStream(), 
+                showDbAndRole, 
+                showCert
+        );
     }
+
 }
