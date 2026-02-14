@@ -70,7 +70,8 @@ public class UserController {
             model.addAttribute("roles", Role.values());
             return "pages/users/form";
         }
-
+        
+        user.setUsername(user.getUsername().toLowerCase());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.createUser(user);
         return "redirect:/users";
@@ -99,7 +100,7 @@ public class UserController {
             existing.setPassword(passwordEncoder.encode(user.getNewPassword()));
         }
 
-        existing.setUsername(user.getUsername());
+        existing.setUsername(user.getUsername().toLowerCase());
         existing.setRole(user.getRole());
         existing.setIsActive(user.getIsActive());
         existing.setDepartment(user.getDepartment());
