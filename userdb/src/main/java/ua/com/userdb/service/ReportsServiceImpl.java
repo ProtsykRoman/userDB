@@ -1,6 +1,7 @@
 package ua.com.userdb.service;
 
 import ua.com.userdb.dao.ReportsRepository;
+import ua.com.userdb.dto.AggregatedRow;
 import ua.com.userdb.dto.ReportFilter;
 import ua.com.userdb.dto.ReportRowDto;
 import ua.com.userdb.dto.ReportSourceType;
@@ -12,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -56,7 +59,7 @@ public class ReportsServiceImpl implements ReportsService {
                     : reportsRepository.findAccessesByRoleNoDate(departmentIds, filter.getDatabaseRoleId());
 
             rows.forEach(r -> result.add(new ReportRowDto(r, ReportSourceType.ACCESS)));
-            return sort(result);
+            return sort(aggregateAccessRows(result));
         }
 
         // ================= ACCESS BY DATABASE =================
@@ -66,7 +69,7 @@ public class ReportsServiceImpl implements ReportsService {
                     : reportsRepository.findAccessesByDatabaseNoDate(departmentIds, filter.getDatabaseId());
 
             rows.forEach(r -> result.add(new ReportRowDto(r, ReportSourceType.ACCESS)));
-            return sort(result);
+            return sort(aggregateAccessRows(result));
         }
 
         // ================= ONLY DEPARTMENT / ПІДРОЗДІЛИ =================
@@ -76,7 +79,7 @@ public class ReportsServiceImpl implements ReportsService {
                     : reportsRepository.findAccessesByDepartmentsNoDate(departmentIds);
 
             rows.forEach(r -> result.add(new ReportRowDto(r, ReportSourceType.ACCESS)));
-            return sort(result);
+            return sort(aggregateAccessRows(result));
         }
 
         // ================= DEFAULT: CERTIFICATES =================
@@ -89,10 +92,39 @@ public class ReportsServiceImpl implements ReportsService {
     }
 
     private List<ReportRowDto> sort(List<ReportRowDto> list) {
-        list.sort(Comparator.comparing(
-                ReportRowDto::getExpirationDate,
-                Comparator.nullsLast(Comparator.naturalOrder())
-        ));
-        return list;
+    	List<ReportRowDto> mutable = new ArrayList<>(list);
+        mutable.sort(
+            Comparator.comparing(ReportRowDto::getUserId)
+                      .thenComparing(
+                          ReportRowDto::getExpirationDate, 
+                          Comparator.nullsLast(Comparator.naturalOrder())
+                      )
+        );
+        return mutable;
     }
+    
+    private List<ReportRowDto> aggregateAccessRows(List<ReportRowDto> rows) {
+
+        Map<String, AggregatedRow> map = new LinkedHashMap<>();
+
+        for (ReportRowDto row : rows) {
+
+            // ключ = user + database
+            String key = row.getUserId() + "|" + row.getDatabaseName();
+
+            map.putIfAbsent(key, new AggregatedRow(row));
+
+            AggregatedRow agg = map.get(key);
+
+            if (row.getDatabaseRoleName() != null) {
+            	agg.addRole(row.getDatabaseRoleName());
+            }
+        }
+
+        return map.values().stream()
+                .map(AggregatedRow::toDto)
+                .toList();
+    }
+    
+    
 }

@@ -223,6 +223,69 @@ public class DBUserController {
 
         return "pages/dbuser/form";
     }
+    
+    @PostMapping
+    public String createDBUser(@ModelAttribute DBUser dbUser, 
+    		@AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
+    		Model model) throws JsonProcessingException  {
+    	if (dbUser.getIdentificationNumber() != null &&
+    	        dbUserService.existsByIdentificationNumber(dbUser.getIdentificationNumber())) {
+
+    		User currentUser = userService
+        	        .findUserByUsername(principal.getUsername())
+        	        .orElseThrow(() -> new RuntimeException("User not found"));
+    		
+    	        model.addAttribute("error",
+    	                "Користувач з таким ідентифікаційним номером вже існує");
+
+    	        model.addAttribute("dbUser", dbUser);
+    	        addFormAttributes(model, dbUser,
+                        currentUser);
+    	        return "pages/dbuser/form";
+    	    }
+
+    	    dbUserService.createDBUser(dbUser);
+    	    return "redirect:/dbusers";
+    }
+
+    @PostMapping("/update/{id}")
+    public String updateDBUser(@PathVariable Integer id, @ModelAttribute DBUser dbUser,
+    							@RequestParam(defaultValue = "1") int page,
+    							@AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
+    							Model model) throws JsonProcessingException {
+    	Optional<DBUser> existing = dbUserService.findById(id);
+    	
+    	User currentUser = userService
+    	        .findUserByUsername(principal.getUsername())
+    	        .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (existing.isPresent()) {
+            Long oldNumber = existing.get().getIdentificationNumber();
+            Long newNumber = dbUser.getIdentificationNumber();
+
+            if (newNumber != null &&
+                !Objects.equals(oldNumber, newNumber) &&
+                dbUserService.existsByIdentificationNumber(newNumber)) {
+
+            	model.addAttribute("dbUser", dbUser);
+                model.addAttribute("error",
+                        "Інший користувач вже має такий ідентифікаційний номер");
+
+                addFormAttributes(model, dbUser,
+                        currentUser);
+                return "pages/dbuser/form";
+            }
+        }
+
+        dbUserService.updateDBUser(id, dbUser);
+        return "redirect:/dbusers?page=" + page;
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteDBUser(@PathVariable Integer id) {
+        dbUserService.deleteDBUser(id);
+        return "redirect:/dbusers";
+    }
 
     /* =========================================================
        FORM HELPERS
@@ -247,6 +310,10 @@ public class DBUserController {
         model.addAttribute("databases", databaseService.findAllDatabase());
         model.addAttribute("databaseRoles", databaseRoleService.findAllDatabaseRole());
         model.addAttribute("certificateTypes", certificateTypeService.findAllCertificateType());
+        
+        model.addAttribute("databasesJson", objectMapper.writeValueAsString(databaseService.findAllDatabase()));
+        model.addAttribute("databaseRolesJson", objectMapper.writeValueAsString(databaseRoleService.findAllDatabaseRole()));
+        model.addAttribute("certificateTypesJson", objectMapper.writeValueAsString(certificateTypeService.findAllCertificateType()));
     }
 
     private <T> List<T> mergeActiveWithSelected(
