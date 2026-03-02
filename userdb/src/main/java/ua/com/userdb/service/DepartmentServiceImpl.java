@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import ua.com.userdb.dao.DepartmentRepository;
 import ua.com.userdb.model.Department;
+import ua.com.userdb.model.Role;
+import ua.com.userdb.model.User;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
@@ -70,6 +72,24 @@ public class DepartmentServiceImpl implements DepartmentService {
         List<Department> sorted = new ArrayList<>();
         buildHierarchy(null, allDepartments, 0, sorted);
         return sorted;
+    }
+    
+    public List<Department> getAllowedDepartmentsForUser(User user) {
+        if (user.getRole() == Role.ADMIN) {
+            return getDepartmentsHierarchy();
+        }
+
+        // USER → тільки свій + підлеглі
+        List<Integer> ids = getSubDepartmentIds(user.getDepartment().getId());
+        List<Department> allowed = new ArrayList<>();
+
+        for (Department dept : getDepartmentsHierarchy()) {
+            if (ids.contains(dept.getId())) {
+                allowed.add(dept);
+            }
+        }
+
+        return allowed;
     }
 
     private void buildHierarchy(Department parent, List<Department> all, int level, List<Department> sorted) {

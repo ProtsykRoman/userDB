@@ -208,3 +208,12 @@
 .btn-cancel:hover {
     background-color: #8c8c8c;
 }
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+    color: #000;              
+    background-color: #f9f9f9;
+    opacity: 1;               
+    cursor: not-allowed;
+}

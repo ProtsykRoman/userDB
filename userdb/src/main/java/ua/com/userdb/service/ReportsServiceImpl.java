@@ -4,6 +4,7 @@ import ua.com.userdb.dao.ReportsRepository;
 import ua.com.userdb.dto.ReportFilter;
 import ua.com.userdb.dto.ReportRowDto;
 import ua.com.userdb.dto.ReportSourceType;
+import ua.com.userdb.model.User;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,29 +20,24 @@ public class ReportsServiceImpl implements ReportsService {
 
     private final ReportsRepository reportsRepository;
     private final DepartmentService departmentService;
+    private final ReportDepartmentAccessService accessService;
 
-    public ReportsServiceImpl(ReportsRepository reportsRepository, DepartmentService departmentService) {
+    public ReportsServiceImpl(ReportsRepository reportsRepository, DepartmentService departmentService,
+    		ReportDepartmentAccessService accessService) {
         this.reportsRepository = reportsRepository;
         this.departmentService = departmentService;
+        this.accessService = accessService;
     }
 
     @Override
-    public List<ReportRowDto> getReport(ReportFilter filter) {
+    public List<ReportRowDto> getReport(User currentUser, ReportFilter filter) {
 
         List<ReportRowDto> result = new ArrayList<>();
         boolean hasDate = filter.getExpirationTo() != null;
 
         // ================= ПІДРОЗДІЛИ =================
-        List<Integer> departmentIds = null;
-        if (filter.getDepartmentId() != null) {
-            if (filter.isOnlyDepartmentSelected()) {
-                // тільки обраний
-                departmentIds = List.of(filter.getDepartmentId());
-            } else {
-                // всі підпідрозділи
-                departmentIds = departmentService.getSubDepartmentIds(filter.getDepartmentId());
-            }
-        }
+        List<Integer> departmentIds =
+                accessService.resolveDepartmentIds(currentUser, filter, departmentService);
 
         // ================= CERTIFICATES =================
         if (filter.getCertificateTypeId() != null) {
