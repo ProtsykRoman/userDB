@@ -10,9 +10,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ua.com.userdb.model.Department;
 import ua.com.userdb.model.User;
+import ua.com.userdb.model.DatabaseRole;
 import ua.com.userdb.service.UserService;
 import ua.com.userdb.dto.ReportFilter;
 import ua.com.userdb.dto.ReportRowDto;
@@ -62,13 +64,17 @@ public class ReportsController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationTo,
             @AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "20") int size,
+            HttpServletRequest request,
             Model model
     ) {
-    	User currentUser = userService.findUserByUsername(principal.getUsername())
+        User currentUser = userService.findUserByUsername(principal.getUsername())
                 .orElseThrow(() -> new IllegalStateException(
                     "Користувач не знайдений: " + principal.getUsername()));
+
+        // Конвертація page у Integer з захистом від "null" або неправильного формату
+        int pageNumber = page;
 
         // Нормалізація
         if (databaseId != null && databaseId <= 0) databaseId = null;
@@ -94,39 +100,50 @@ public class ReportsController {
 
         List<ReportRowDto> fullReport = reportsService.getReport(currentUser, filter);
 
+        // Сторінкування
         int totalRecords = fullReport.size();
         int totalPages = (int) Math.ceil((double) totalRecords / size);
-
-        int fromIndex = Math.min((page - 1) * size, totalRecords);
+        int fromIndex = Math.min((pageNumber - 1) * size, totalRecords);
         int toIndex = Math.min(fromIndex + size, totalRecords);
         List<ReportRowDto> reportPage = fullReport.subList(fromIndex, toIndex);
 
-        // Підготовка моделі
-        List<Department> allowedDepartments =
-                departmentService.getAllowedDepartmentsForUser(currentUser);
+        // Дозволені підрозділи
+        List<Department> allowedDepartments = departmentService.getAllowedDepartmentsForUser(currentUser);
 
+        // Атрибути моделі
         model.addAttribute("departments", allowedDepartments);
         model.addAttribute("databases", databaseService.findAllDatabase());
 
-        List<ua.com.userdb.model.DatabaseRole> sortedRoles = databaseRoleService.findAllDatabaseRole();
-        sortedRoles.sort(java.util.Comparator.comparing((ua.com.userdb.model.DatabaseRole r) -> r.getDatabase().getName())
-                .thenComparing(ua.com.userdb.model.DatabaseRole::getName));
+        List<DatabaseRole> sortedRoles = databaseRoleService.findAllDatabaseRole();
+        sortedRoles.sort(java.util.Comparator.comparing((DatabaseRole r) -> r.getDatabase().getName())
+                .thenComparing(DatabaseRole::getName));
         model.addAttribute("databaseRoles", sortedRoles);
         model.addAttribute("certificateTypes", certificateTypeService.findAllCertificateType());
 
         model.addAttribute("report", reportPage);
-        model.addAttribute("currentPage", page);
+        model.addAttribute("currentPage", pageNumber);
         model.addAttribute("pageSize", size);
         model.addAttribute("totalRecords", totalRecords);
         model.addAttribute("totalPages", totalPages);
 
-        // Атрибути фільтрів
         model.addAttribute("departmentId", departmentId);
         model.addAttribute("databaseId", databaseId);
         model.addAttribute("databaseRoleId", databaseRoleId);
         model.addAttribute("certificateTypeId", certificateTypeId);
         model.addAttribute("onlyDepartmentSelected", onlyDepartmentSelected);
         model.addAttribute("expirationTo", expirationTo);
+
+        // Формуємо returnUrl без page=null
+        String returnUrl = request.getRequestURI();
+        String queryString = request.getQueryString();
+        if (queryString != null) {
+            queryString = java.util.Arrays.stream(queryString.split("&"))
+                    .filter(s -> !s.startsWith("page=") && !s.endsWith("=null"))
+                    .reduce((a, b) -> a + "&" + b)
+                    .orElse("");
+            if (!queryString.isEmpty()) returnUrl += "?" + queryString;
+        }
+        model.addAttribute("returnUrl", returnUrl);
 
         return "pages/reports/reports";
     }
@@ -145,9 +162,9 @@ public class ReportsController {
             HttpServletResponse response
     ) throws IOException {
 
-    	User currentUser = userService.findUserByUsername(principal.getUsername())
+        User currentUser = userService.findUserByUsername(principal.getUsername())
                 .orElseThrow(() -> new IllegalStateException(
-                    "Користувач не знайдений: " + principal.getUsername()));
+                        "Користувач не знайдений: " + principal.getUsername()));
 
         if (databaseId != null && databaseId <= 0) databaseId = null;
         if (databaseRoleId != null && databaseRoleId <= 0) databaseRoleId = null;

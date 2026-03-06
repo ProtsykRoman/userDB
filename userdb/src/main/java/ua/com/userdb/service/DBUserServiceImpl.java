@@ -6,7 +6,9 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ua.com.userdb.dao.CertificateTypeRepository;
 import ua.com.userdb.dao.DBUserRepository;
+import ua.com.userdb.dao.DatabaseRepository;
 import ua.com.userdb.model.DBUser;
 import ua.com.userdb.model.DBUserAccess;
 import ua.com.userdb.model.DBUserCertificate;
@@ -16,9 +18,14 @@ import ua.com.userdb.model.DBUserRole;
 public class DBUserServiceImpl implements DBUserService {
 
 	private final DBUserRepository dbUserRepository;
+	private final CertificateTypeRepository certificateTypeRepository;
+	private final DatabaseRepository databaseRepository;
 
-	public DBUserServiceImpl(DBUserRepository dbUserRepository) {
+	public DBUserServiceImpl(DBUserRepository dbUserRepository, CertificateTypeRepository certificateTypeRepository,
+			DatabaseRepository databaseRepository) {
 		this.dbUserRepository = dbUserRepository;
+		this.certificateTypeRepository = certificateTypeRepository;
+		this.databaseRepository = databaseRepository;
 	}
 
 	@Override
@@ -57,20 +64,51 @@ public class DBUserServiceImpl implements DBUserService {
 
 			// --- оновлення доступів ---
 			existing.getDbUserAccesses().clear();
+
 			if (dbUser.getDbUserAccesses() != null) {
-				for (DBUserAccess access : dbUser.getDbUserAccesses()) {
-					access.setDbUser(existing); // обов'язково
-					existing.getDbUserAccesses().add(access);
-				}
+			    for (DBUserAccess access : dbUser.getDbUserAccesses()) {
+
+			        if (access.getDatabase() == null ||
+			            access.getDatabase().getId() == null) {
+			            continue;
+			        }
+
+			        access.setDbUser(existing);
+
+			        var database = databaseRepository
+			                .findById(access.getDatabase().getId())
+			                .orElseThrow();
+
+			        access.setDatabase(database);
+
+			        existing.getDbUserAccesses().add(access);
+			    }
 			}
 
 			// --- оновлення сертифікатів ---
 			existing.getDbUserCertificates().clear();
 			if (dbUser.getDbUserCertificates() != null) {
-				for (DBUserCertificate cert : dbUser.getDbUserCertificates()) {
-					cert.setDbUser(existing);
-					existing.getDbUserCertificates().add(cert);
-				}
+			    for (DBUserCertificate cert : dbUser.getDbUserCertificates()) {
+
+			    	if (cert.getCertificateType() == null ||
+			                cert.getCertificateType().getId() == null) {
+			                continue;
+			            }
+			    	
+			        cert.setDbUser(existing);
+
+			        if (cert.getCertificateType() != null &&
+			            cert.getCertificateType().getId() != null) {
+
+			            var type = certificateTypeRepository
+			                    .findById(cert.getCertificateType().getId())
+			                    .orElseThrow();
+
+			            cert.setCertificateType(type);
+			        }
+
+			        existing.getDbUserCertificates().add(cert);
+			    }
 			}
 
 			// --- оновлення ролей ---

@@ -23,8 +23,9 @@
 			th:action="${dbUser.id == null} ? @{/dbusers} : @{/dbusers/update/{id}(id=${dbUser.id})}"
 			method="post">
 
-			<input type="hidden" name="page" th:value="${currentPage}" />
-			<input type="hidden" th:field="*{id}" />
+			<input type="hidden" name="page" th:if="${currentPage != null}"
+				th:value="${currentPage}" /> <input type="hidden" name="returnUrl"
+				th:value="${returnUrl}" /> <input type="hidden" th:field="*{id}" />
 
 			<!-- Перший рядок: ПІБ + Ідентифікаційний номер -->
 			<div class="form-row">
@@ -53,17 +54,20 @@
 							th:text="${r.name}"></option>
 
 					</select> <label class="checkbox-inline"> <input type="checkbox"
-						th:field="*{isActive}" th:disabled="${readOnly == true}"/> Активний
+						th:field="*{isActive}" th:disabled="${readOnly == true}" />
+						Активний
 					</label>
 				</div>
 
 				<div class="form-group">
 					<label for="department">Підрозділ:</label> <select id="department"
-						th:field="*{department.id}" th:disabled="${readOnly == true}" required>
+						th:field="*{department.id}" th:disabled="${readOnly == true}"
+						required>
 
 						<option value="" disabled
-							th:selected="${dbUser.department == null}" th:disabled="${readOnly == true}">--- Виберіть
-							підрозділ ---</option>
+							th:selected="${dbUser.department == null}"
+							th:disabled="${readOnly == true}">--- Виберіть підрозділ
+							---</option>
 
 						<option th:each="dept : ${allDepartments}" th:value="${dept.id}"
 							th:text="${'--'.repeat(dept.level) + dept.name}"></option>
@@ -77,7 +81,8 @@
 			<!-- Таблиця сертифікатів -->
 			<div class="table-header">
 				<h3>Сертифікати користувача</h3>
-				<button type="button" class="btn-add" id="addCertBtn" th:if="${readOnly != true}">Додати</button>
+				<button type="button" class="btn-add" id="addCertBtn"
+					th:if="${readOnly != true}">Додати</button>
 			</div>
 			<table id="certTable" class="data-table">
 				<thead>
@@ -101,12 +106,14 @@
 									th:selected="${cert.certificateType != null} ? ${c.id} == ${cert.certificateType.id} : false"></option>
 						</select></td>
 						<td><input type="text"
-							th:field="*{dbUserCertificates[__${iStat.index}__].number}" th:disabled="${readOnly == true}"/></td>
+							th:field="*{dbUserCertificates[__${iStat.index}__].number}"
+							th:disabled="${readOnly == true}" /></td>
 						<td><input type="date"
-							th:field="*{dbUserCertificates[__${iStat.index}__].expirationDate}" th:disabled="${readOnly == true}"/></td>
+							th:field="*{dbUserCertificates[__${iStat.index}__].expirationDate}"
+							th:disabled="${readOnly == true}" /></td>
 						<td><input type="checkbox"
-							th:field="*{dbUserCertificates[__${iStat.index}__].blocked}" th:disabled="${readOnly == true}"/>
-						</td>
+							th:field="*{dbUserCertificates[__${iStat.index}__].blocked}"
+							th:disabled="${readOnly == true}" /></td>
 
 						<td class="action-cell" th:if="${readOnly != true}">
 							<button type="button" class="btn-delete"
@@ -119,7 +126,8 @@
 			<!-- Таблиця доступів -->
 			<div class="table-header">
 				<h3>Доступи до баз даних</h3>
-				<button type="button" class="btn-add" id="addAccessBtn" th:if="${readOnly != true}">Додати</button>
+				<button type="button" class="btn-add" id="addAccessBtn"
+					th:if="${readOnly != true}">Додати</button>
 			</div>
 			<table id="accessTable" class="data-table">
 				<thead>
@@ -141,7 +149,8 @@
 									th:selected="${access.database != null} ? ${db.id} == ${access.database.id} : false"></option>
 						</select></td>
 						<td><input type="date"
-							th:field="*{dbUserAccesses[__${iStat.index}__].accessExpirationDate}" th:disabled="${readOnly == true}"/></td>
+							th:field="*{dbUserAccesses[__${iStat.index}__].accessExpirationDate}"
+							th:disabled="${readOnly == true}" /></td>
 						<td class="action-cell" th:if="${readOnly != true}">
 							<button type="button" class="btn-delete"
 								onclick="removeAccessRow(this)">Видалити</button>
@@ -153,7 +162,8 @@
 			<!-- Таблиця ролей -->
 			<div class="table-header">
 				<h3>Ролі користувача</h3>
-				<button type="button" class="btn-add" id="addRoleBtn" th:if="${readOnly != true}">Додати</button>
+				<button type="button" class="btn-add" id="addRoleBtn"
+					th:if="${readOnly != true}">Додати</button>
 			</div>
 			<table id="roleTable" class="data-table">
 				<thead>
@@ -168,7 +178,8 @@
 							th:field="*{dbUserRoles[__${iStat.index}__].id}" /> <select
 							th:field="*{dbUserRoles[__${iStat.index}__].databaseRole.id}"
 							th:disabled="${readOnly == true}" required>
-								<option value="" th:disabled="${readOnly == true}">-- Виберіть роль --</option>
+								<option value="" th:disabled="${readOnly == true}">--
+									Виберіть роль --</option>
 								<option th:each="r : ${databaseRoles}" th:value="${r.id}"
 									th:text="${r.name + ': (' + r.database.name + ')'}"
 									th:selected="${role.databaseRole != null} ? ${r.id} == ${role.databaseRole.id} : false"></option>
@@ -183,7 +194,9 @@
 
 			<div class="form-buttons">
 				<button type="submit" class="btn-add" th:if="${readOnly != true}">Зберегти</button>
-				<a th:href="@{/dbusers(page=${currentPage})}" class="btn-cancel">Скасувати</a>
+				<a th:if="${returnUrl != null}" th:href="${returnUrl}"
+					class="btn-cancel">Скасувати</a> <a th:if="${returnUrl == null}"
+					th:href="@{/dbusers(page=${currentPage})}" class="btn-cancel">Скасувати</a>
 			</div>
 
 		</form>

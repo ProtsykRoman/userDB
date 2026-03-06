@@ -54,22 +54,25 @@ public class DBUserController {
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public String listDBUsers(
-    		@AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String rank,
             @RequestParam(required = false) String department,
             @RequestParam(required = false) String identificationNumber,
             @RequestParam(required = false) String isActive,
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) Integer page,
             @RequestParam(defaultValue = "20") int size,
             Model model
     ) {
 
-    	User currentUser = userService
-    	        .findUserByUsername(principal.getUsername())
-    	        .orElseThrow(() -> new RuntimeException("User not found"));
-    	
-        // ===== ДОЗВОЛЕНІ ДЕПАРТАМЕНТИ =====
+        if (page == null) {
+            page = 1;
+        }
+
+        User currentUser = userService
+                .findUserByUsername(principal.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         List<Department> allowedDepartments =
                 departmentService.getAllowedDepartmentsForUser(currentUser);
 
@@ -78,7 +81,6 @@ public class DBUserController {
 
         List<DBUser> users = dbUserService.findAll();
 
-        // ===== ОБМЕЖЕННЯ ПО ДЕПАРТАМЕНТАХ =====
         if (currentUser.getRole() != Role.ADMIN) {
 
             List<Integer> allowedDeptIds =
@@ -91,8 +93,6 @@ public class DBUserController {
                             allowedDeptIds.contains(u.getDepartment().getId()))
                     .collect(Collectors.toList());
         }
-
-        // ===== ФІЛЬТРИ =====
 
         if (name != null && !name.isEmpty()) {
             users = users.stream()
@@ -112,7 +112,6 @@ public class DBUserController {
             try {
                 Integer deptId = Integer.parseInt(department);
 
-                // USER не може вибрати чужий департамент
                 if (currentUser.getRole() != Role.ADMIN &&
                         allowedDepartments.stream().noneMatch(d -> d.getId().equals(deptId))) {
                     return "redirect:/dbusers";
@@ -156,25 +155,37 @@ public class DBUserController {
     }
 
     /* =========================================================
-       CREATE
+       EDIT
        ========================================================= */
 
-    @GetMapping("/new")
+    @GetMapping("/edit/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public String showCreateForm(@AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
-                                 Model model) throws JsonProcessingException {
+    public String showEditForm(@PathVariable Integer id,
+                               @RequestParam(required = false) String returnUrl,
+                               @RequestParam(required = false) Integer page,
+                               @AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
+                               Model model) throws JsonProcessingException {
 
-    	User currentUser = userService
-    	        .findUserByUsername(principal.getUsername())
-    	        .orElseThrow(() -> new RuntimeException("User not found"));
-    	
-    	DBUser dbUser = new DBUser();
-        dbUser.setDbUserAccesses(new ArrayList<>());
-        dbUser.setDbUserCertificates(new ArrayList<>());
-        dbUser.setDbUserRoles(new ArrayList<>());
+        User currentUser = userService
+                .findUserByUsername(principal.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Optional<DBUser> dbUserOpt = dbUserService.findById(id);
+        if (dbUserOpt.isEmpty()) {
+            return "redirect:/dbusers";
+        }
+
+        DBUser dbUser = dbUserOpt.get();
 
         model.addAttribute("dbUser", dbUser);
         model.addAttribute("readOnly", currentUser.getRole() == Role.USER);
+        model.addAttribute("currentPage", page);
+
+        if (returnUrl != null && !returnUrl.isBlank()) {
+            model.addAttribute("returnUrl", returnUrl);
+        } else if (page != null) {
+            model.addAttribute("returnUrl", "/dbusers?page=" + page);
+        }
 
         addFormAttributes(model, dbUser, currentUser);
 
@@ -182,104 +193,58 @@ public class DBUserController {
     }
 
     /* =========================================================
-       EDIT
+       UPDATE
        ========================================================= */
 
-    @GetMapping("/edit/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public String showEditForm(@PathVariable Integer id,
-    		@AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
+    @PostMapping("/update/{id}")
+    public String updateDBUser(@PathVariable Integer id,
+                               @ModelAttribute DBUser dbUser,
+                               @RequestParam(required = false) String returnUrl,
+                               @RequestParam(required = false) Integer page,
+                               @AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
                                Model model) throws JsonProcessingException {
 
-    	User currentUser = userService
-    	        .findUserByUsername(principal.getUsername())
-    	        .orElseThrow(() -> new RuntimeException("User not found"));
-    	
-    	Optional<DBUser> dbUserOpt = dbUserService.findById(id);
-        if (dbUserOpt.isEmpty()) {
-            return "redirect:/dbusers";
-        }
+        User currentUser = userService
+                .findUserByUsername(principal.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        DBUser dbUser = dbUserOpt.get();
-
-        // ===== ЗАХИСТ =====
-        if (currentUser.getRole() != Role.ADMIN) {
-
-            List<Integer> allowedDeptIds =
-                    departmentService.getSubDepartmentIds(
-                            currentUser.getDepartment().getId()
-                    );
-
-            if (dbUser.getDepartment() == null ||
-                    !allowedDeptIds.contains(dbUser.getDepartment().getId())) {
-                return "redirect:/dbusers";
-            }
-        }
-
-        model.addAttribute("dbUser", dbUser);
-        model.addAttribute("readOnly", currentUser.getRole() == Role.USER);
-
-        addFormAttributes(model, dbUser, currentUser);
-
-        return "pages/dbuser/form";
-    }
-    
-    @PostMapping
-    public String createDBUser(@ModelAttribute DBUser dbUser, 
-    		@AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
-    		Model model) throws JsonProcessingException  {
-    	if (dbUser.getIdentificationNumber() != null &&
-    	        dbUserService.existsByIdentificationNumber(dbUser.getIdentificationNumber())) {
-
-    		User currentUser = userService
-        	        .findUserByUsername(principal.getUsername())
-        	        .orElseThrow(() -> new RuntimeException("User not found"));
-    		
-    	        model.addAttribute("error",
-    	                "Користувач з таким ідентифікаційним номером вже існує");
-
-    	        model.addAttribute("dbUser", dbUser);
-    	        addFormAttributes(model, dbUser,
-                        currentUser);
-    	        return "pages/dbuser/form";
-    	    }
-
-    	    dbUserService.createDBUser(dbUser);
-    	    return "redirect:/dbusers";
-    }
-
-    @PostMapping("/update/{id}")
-    public String updateDBUser(@PathVariable Integer id, @ModelAttribute DBUser dbUser,
-    							@RequestParam(defaultValue = "1") int page,
-    							@AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
-    							Model model) throws JsonProcessingException {
-    	Optional<DBUser> existing = dbUserService.findById(id);
-    	
-    	User currentUser = userService
-    	        .findUserByUsername(principal.getUsername())
-    	        .orElseThrow(() -> new RuntimeException("User not found"));
+        Optional<DBUser> existing = dbUserService.findById(id);
 
         if (existing.isPresent()) {
+
             Long oldNumber = existing.get().getIdentificationNumber();
             Long newNumber = dbUser.getIdentificationNumber();
 
             if (newNumber != null &&
-                !Objects.equals(oldNumber, newNumber) &&
-                dbUserService.existsByIdentificationNumber(newNumber)) {
+                    !Objects.equals(oldNumber, newNumber) &&
+                    dbUserService.existsByIdentificationNumber(newNumber)) {
 
-            	model.addAttribute("dbUser", dbUser);
+                model.addAttribute("dbUser", dbUser);
                 model.addAttribute("error",
                         "Інший користувач вже має такий ідентифікаційний номер");
 
-                addFormAttributes(model, dbUser,
-                        currentUser);
+                addFormAttributes(model, dbUser, currentUser);
+
                 return "pages/dbuser/form";
             }
         }
 
         dbUserService.updateDBUser(id, dbUser);
-        return "redirect:/dbusers?page=" + page;
+
+        if (returnUrl != null && returnUrl.startsWith("/")) {
+            return "redirect:" + returnUrl;
+        }
+
+        if (page != null) {
+            return "redirect:/dbusers?page=" + page;
+        }
+
+        return "redirect:/dbusers";
     }
+
+    /* =========================================================
+       DELETE
+       ========================================================= */
 
     @GetMapping("/delete/{id}")
     public String deleteDBUser(@PathVariable Integer id) {
@@ -310,7 +275,7 @@ public class DBUserController {
         model.addAttribute("databases", databaseService.findAllDatabase());
         model.addAttribute("databaseRoles", databaseRoleService.findAllDatabaseRole());
         model.addAttribute("certificateTypes", certificateTypeService.findAllCertificateType());
-        
+
         model.addAttribute("databasesJson", objectMapper.writeValueAsString(databaseService.findAllDatabase()));
         model.addAttribute("databaseRolesJson", objectMapper.writeValueAsString(databaseRoleService.findAllDatabaseRole()));
         model.addAttribute("certificateTypesJson", objectMapper.writeValueAsString(certificateTypeService.findAllCertificateType()));
