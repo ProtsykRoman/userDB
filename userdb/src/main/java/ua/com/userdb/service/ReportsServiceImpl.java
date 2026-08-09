@@ -53,20 +53,36 @@ public class ReportsServiceImpl implements ReportsService {
         }
 
         // ================= ACCESS BY ROLE =================
-        if (filter.getDatabaseRoleId() != null) {
+        if (filter.getDatabaseRoleIds() != null &&
+                !filter.getDatabaseRoleIds().isEmpty()) {
+
             var rows = hasDate
-                    ? reportsRepository.findAccessesByRoleWithDate(departmentIds, filter.getDatabaseRoleId(), filter.getExpirationTo())
-                    : reportsRepository.findAccessesByRoleNoDate(departmentIds, filter.getDatabaseRoleId());
+                    ? reportsRepository.findAccessesByRolesWithDate(
+                    	    departmentIds,
+                    	    filter.getDatabaseRoleIds(),
+                    	    filter.getExpirationTo()
+                    	)
+                    : reportsRepository.findAccessesByRolesNoDate(
+                    	    departmentIds,
+                    	    filter.getDatabaseRoleIds()
+                    	);
 
             rows.forEach(r -> result.add(new ReportRowDto(r, ReportSourceType.ACCESS)));
             return sort(aggregateAccessRows(result));
         }
 
         // ================= ACCESS BY DATABASE =================
-        if (filter.getDatabaseId() != null) {
+        if (filter.getDatabaseIds() != null &&
+                !filter.getDatabaseIds().isEmpty()) {
+
             var rows = hasDate
-                    ? reportsRepository.findAccessesByDatabaseWithDate(departmentIds, filter.getDatabaseId(), filter.getExpirationTo())
-                    : reportsRepository.findAccessesByDatabaseNoDate(departmentIds, filter.getDatabaseId());
+                    ? reportsRepository.findAccessesByDatabasesWithDate(
+                            departmentIds,
+                            filter.getDatabaseIds(),
+                            filter.getExpirationTo())
+                    : reportsRepository.findAccessesByDatabasesNoDate(
+                            departmentIds,
+                            filter.getDatabaseIds());
 
             rows.forEach(r -> result.add(new ReportRowDto(r, ReportSourceType.ACCESS)));
             return sort(aggregateAccessRows(result));

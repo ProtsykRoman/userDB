@@ -25,10 +25,15 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
+        String roleName = (user.getRole() !=null) ? user.getRole().name() : "USER";
+        if (roleName == null || (!roleName.equals("ADMIN") && !roleName.equals("USER"))) {
+        	roleName = "USER";
+        }
+        
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .authorities(List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())))
+                .authorities(List.of(new SimpleGrantedAuthority("ROLE_" + roleName)))
                 .accountLocked(!user.getIsActive())
                 .build();
     }

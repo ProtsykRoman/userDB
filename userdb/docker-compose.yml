@@ -5,7 +5,7 @@ services:
     container_name: postgres-userDB
     restart: always
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
       POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     volumes:
@@ -16,6 +16,7 @@ services:
 
   app:
     build: .
+    image: userdb-v100-fixed
     container_name: java_app
     restart: always
     depends_on:
@@ -27,6 +28,8 @@ services:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      "admin.password": "${ADMIN_PASSWORD}"
 
 volumes:
   postgres_data:

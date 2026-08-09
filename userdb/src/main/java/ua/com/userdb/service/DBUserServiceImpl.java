@@ -9,10 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.com.userdb.dao.CertificateTypeRepository;
 import ua.com.userdb.dao.DBUserRepository;
 import ua.com.userdb.dao.DatabaseRepository;
+import ua.com.userdb.dao.DatabaseRoleRepository;
 import ua.com.userdb.model.DBUser;
 import ua.com.userdb.model.DBUserAccess;
 import ua.com.userdb.model.DBUserCertificate;
 import ua.com.userdb.model.DBUserRole;
+import ua.com.userdb.model.DatabaseRole;
 
 @Service
 public class DBUserServiceImpl implements DBUserService {
@@ -20,12 +22,14 @@ public class DBUserServiceImpl implements DBUserService {
 	private final DBUserRepository dbUserRepository;
 	private final CertificateTypeRepository certificateTypeRepository;
 	private final DatabaseRepository databaseRepository;
+	private final DatabaseRoleRepository databaseRoleRepository;
 
 	public DBUserServiceImpl(DBUserRepository dbUserRepository, CertificateTypeRepository certificateTypeRepository,
-			DatabaseRepository databaseRepository) {
+			DatabaseRepository databaseRepository, DatabaseRoleRepository databaseRoleRepository) {
 		this.dbUserRepository = dbUserRepository;
 		this.certificateTypeRepository = certificateTypeRepository;
 		this.databaseRepository = databaseRepository;
+		this.databaseRoleRepository = databaseRoleRepository;
 	}
 
 	@Override
@@ -113,11 +117,26 @@ public class DBUserServiceImpl implements DBUserService {
 
 			// --- оновлення ролей ---
 			existing.getDbUserRoles().clear();
+
 			if (dbUser.getDbUserRoles() != null) {
-				for (DBUserRole role : dbUser.getDbUserRoles()) {
-					role.setDbUser(existing);
-					existing.getDbUserRoles().add(role);
-				}
+
+			    for (DBUserRole role : dbUser.getDbUserRoles()) {
+
+			        // пропускаємо порожні рядки
+			        if (role.getDatabaseRole() == null ||
+			            role.getDatabaseRole().getId() == null) {
+			            continue;
+			        }
+
+			        DatabaseRole databaseRole = databaseRoleRepository
+			                .findById(role.getDatabaseRole().getId())
+			                .orElseThrow();
+
+			        role.setDbUser(existing);
+			        role.setDatabaseRole(databaseRole);
+
+			        existing.getDbUserRoles().add(role);
+			    }
 			}
 
 			return dbUserRepository.save(existing);

@@ -8,6 +8,8 @@ import ua.com.userdb.model.Department;
 import ua.com.userdb.model.Role;
 import ua.com.userdb.service.UserService;
 import ua.com.userdb.service.DepartmentService;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/users")
+@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
 
     private final UserService userService;

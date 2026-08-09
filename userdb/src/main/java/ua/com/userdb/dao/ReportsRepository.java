@@ -80,6 +80,29 @@ public interface ReportsRepository extends JpaRepository<DBUser, Integer> {
             @Param("departmentIds") List<Integer> departmentIds,
             @Param("databaseId") Integer databaseId
     );
+    
+    @Query("""
+    	    SELECT new ua.com.userdb.dto.ReportRowDto(
+    	        u.id, u.identificationNumber, u.name, d.name, u.isActive,
+    	        db.name, dr.name, null, null, a.accessExpirationDate, null
+    	    )
+    	    FROM DBUserAccess a
+    	        JOIN a.dbUser u
+    	        JOIN u.department d
+    	        JOIN a.database db
+    	        LEFT JOIN DBUserRole ur
+    	               ON ur.dbUser = u
+    	              AND ur.databaseRole.database = db
+    	        LEFT JOIN ur.databaseRole dr
+    	    WHERE u.isActive = true
+    	      AND (a.isBlocked = false OR a.isBlocked IS NULL)
+    	      AND (:departmentIds IS NULL OR d.id IN :departmentIds)
+    	      AND db.id IN :databaseIds
+    	""")
+    	List<ReportRowDto> findAccessesByDatabasesNoDate(
+    	        @Param("departmentIds") List<Integer> departmentIds,
+    	        @Param("databaseIds") List<Integer> databaseIds
+    	);
 
     @Query("""
         SELECT new ua.com.userdb.dto.ReportRowDto(
@@ -105,6 +128,31 @@ public interface ReportsRepository extends JpaRepository<DBUser, Integer> {
             @Param("databaseId") Integer databaseId,
             @Param("expTo") LocalDate expTo
     );
+    
+    @Query("""
+    	    SELECT new ua.com.userdb.dto.ReportRowDto(
+    	        u.id, u.identificationNumber, u.name, d.name, u.isActive,
+    	        db.name, dr.name, null, null, a.accessExpirationDate, null
+    	    )
+    	    FROM DBUserAccess a
+    	        JOIN a.dbUser u
+    	        JOIN u.department d
+    	        JOIN a.database db
+    	        LEFT JOIN DBUserRole ur
+    	               ON ur.dbUser = u
+    	              AND ur.databaseRole.database = db
+    	        LEFT JOIN ur.databaseRole dr
+    	    WHERE u.isActive = true
+    	      AND (a.isBlocked = false OR a.isBlocked IS NULL)
+    	      AND (:departmentIds IS NULL OR d.id IN :departmentIds)
+    	      AND db.id IN :databaseIds
+    	      AND a.accessExpirationDate <= :expTo
+    	""")
+    	List<ReportRowDto> findAccessesByDatabasesWithDate(
+    	        @Param("departmentIds") List<Integer> departmentIds,
+    	        @Param("databaseIds") List<Integer> databaseIds,
+    	        @Param("expTo") LocalDate expTo
+    	);
 
     // ===================== ACCESS BY ROLE =====================
     // ЦІ ЗАПИТИ НЕ ЧІПАЄМО (вони вже правильні)
@@ -129,6 +177,27 @@ public interface ReportsRepository extends JpaRepository<DBUser, Integer> {
             @Param("departmentIds") List<Integer> departmentIds,
             @Param("roleId") Integer roleId
     );
+    
+    @Query("""
+    	    SELECT new ua.com.userdb.dto.ReportRowDto(
+    	        u.id, u.identificationNumber, u.name, d.name, u.isActive,
+    	        db.name, dr.name, null, null, a.accessExpirationDate, null
+    	    )
+    	    FROM DBUserRole ur
+    	        JOIN ur.dbUser u
+    	        JOIN u.department d
+    	        JOIN ur.databaseRole dr
+    	        JOIN dr.database db
+    	        JOIN DBUserAccess a ON a.dbUser = u AND a.database = db
+    	    WHERE u.isActive = true
+    	      AND (a.isBlocked = false OR a.isBlocked IS NULL)
+    	      AND (:departmentIds IS NULL OR d.id IN :departmentIds)
+    	      AND dr.id IN :roleIds
+    	""")
+    	List<ReportRowDto> findAccessesByRolesNoDate(
+    	        @Param("departmentIds") List<Integer> departmentIds,
+    	        @Param("roleIds") List<Integer> roleIds
+    	);
 
     @Query("""
         SELECT new ua.com.userdb.dto.ReportRowDto(
@@ -152,6 +221,29 @@ public interface ReportsRepository extends JpaRepository<DBUser, Integer> {
             @Param("roleId") Integer roleId,
             @Param("expTo") LocalDate expTo
     );
+    
+    @Query("""
+    	    SELECT new ua.com.userdb.dto.ReportRowDto(
+    	        u.id, u.identificationNumber, u.name, d.name, u.isActive,
+    	        db.name, dr.name, null, null, a.accessExpirationDate, null
+    	    )
+    	    FROM DBUserRole ur
+    	        JOIN ur.dbUser u
+    	        JOIN u.department d
+    	        JOIN ur.databaseRole dr
+    	        JOIN dr.database db
+    	        JOIN DBUserAccess a ON a.dbUser = u AND a.database = db
+    	    WHERE u.isActive = true
+    	      AND (a.isBlocked = false OR a.isBlocked IS NULL)
+    	      AND (:departmentIds IS NULL OR d.id IN :departmentIds)
+    	      AND dr.id IN :roleIds
+    	      AND a.accessExpirationDate <= :expTo
+    	""")
+    	List<ReportRowDto> findAccessesByRolesWithDate(
+    	        @Param("departmentIds") List<Integer> departmentIds,
+    	        @Param("roleIds") List<Integer> roleIds,
+    	        @Param("expTo") LocalDate expTo
+    	);
 
     // ===================== ONLY DEPARTMENT =====================
 

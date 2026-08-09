@@ -1,0 +1,187 @@
+/* ===== MULTI SELECT ===== */
+
+.multi-dropdown {
+    position: relative;
+}
+
+.dropdown-btn {
+    width: 100%;
+    height: 40px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: #fff;
+    text-align: left;
+    padding: 0 12px;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 13px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 42px;
+    left: 0;
+    background: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 9999;
+    box-shadow: 0 3px 12px rgba(0,0,0,.15);
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown-content label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.dropdown-content label:hover {
+    background: #f5f5f5;
+}
+
+.role-search {
+    width: calc(100% - 12px);
+    margin: 6px;
+    padding: 6px;
+    box-sizing: border-box;
+}
+
+
+/* СПИСОК РОЛЕЙ */
+
+#roleDropdown .role-item {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+
+    width: 100%;
+
+    padding: 8px 12px;
+
+    gap: 10px;
+
+    box-sizing: border-box;
+
+    white-space: normal;
+}
+
+#roleDropdown .role-item input[type="checkbox"] {
+    width: 16px !important;
+    height: 16px !important;
+
+    margin: 0 !important;
+
+    flex: 0 0 16px;
+}
+
+#roleDropdown .role-item span {
+    display: block !important;
+
+    flex: 1 1 auto;
+
+    text-align: left;
+
+    white-space: normal;
+
+    word-break: break-word;
+}
+
+#roleDropdown .role-item:hover {
+    background: #f5f7fa;
+}
+
+#roleDropdown .role-item.hidden {
+    display: none !important;
+}
+
+/* ==========================
+   DATABASE MODAL
+========================== */
+
+.selector-btn {
+    width: 100%;
+    height: 40px;
+    border: 1px solid #cfd4da;
+    border-radius: 5px;
+    background: white;
+    text-align: left;
+    padding: 0 12px;
+    cursor: pointer;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.35);
+    z-index: 10000;
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    width: 500px;
+    max-width: 90vw;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+.modal-header {
+    padding: 15px 20px;
+    font-size: 18px;
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-body {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.modal-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal-item:hover {
+    background: #f5f7fa;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px;
+    border-top: 1px solid #ddd;
+}
+
+#roleDropdown {
+    width: 100%;
+    min-width: 320px;
+    max-height: 350px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}

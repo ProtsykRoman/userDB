@@ -3,6 +3,7 @@ package ua.com.userdb.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ import ua.com.userdb.service.DatabaseService;
 
 @Controller
 @RequestMapping("/dbuseraccess")
+@PreAuthorize("hasRole('ADMIN')")
 public class DBUserAccessController {
 
 	private final DBUserAccessService dbUserAccessService;

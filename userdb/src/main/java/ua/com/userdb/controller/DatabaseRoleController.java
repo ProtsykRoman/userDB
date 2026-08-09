@@ -1,5 +1,6 @@
 package ua.com.userdb.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/database-roles")
+@PreAuthorize("hasRole('ADMIN')")
 public class DatabaseRoleController {
 
     private final DatabaseRoleService databaseRoleService;

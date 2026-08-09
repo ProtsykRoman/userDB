@@ -26,6 +26,8 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/css/**", "/js/**", "/favicon.ico").permitAll()
+                .requestMatchers("/databases/**", "/database-roles/**", "/certificate-types/**", 
+                        "/departments/**", "/ranks/**", "/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -34,6 +36,9 @@ public class SecurityConfig {
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
+            .exceptionHandling(exception -> exception
+                    .accessDeniedPage("/home") 
+                )
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout")

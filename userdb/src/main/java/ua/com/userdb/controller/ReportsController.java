@@ -57,8 +57,8 @@ public class ReportsController {
     @GetMapping
     public String reports(
             @RequestParam(required = false) Integer departmentId,
-            @RequestParam(required = false) Integer databaseId,
-            @RequestParam(required = false) Integer databaseRoleId,
+            @RequestParam(required = false) List<Integer> databaseIds,
+            @RequestParam(required = false) List<Integer> databaseRoleIds,
             @RequestParam(required = false) Integer certificateTypeId,
             @RequestParam(required = false) Boolean onlyDepartmentSelected,
             @RequestParam(required = false)
@@ -77,23 +77,23 @@ public class ReportsController {
         int pageNumber = page;
 
         // Нормалізація
-        if (databaseId != null && databaseId <= 0) databaseId = null;
-        if (databaseRoleId != null && databaseRoleId <= 0) databaseRoleId = null;
+        if (databaseIds != null && databaseIds.isEmpty()) databaseIds = null;
+        if (databaseRoleIds != null && databaseRoleIds.isEmpty()) databaseRoleIds = null;
         if (certificateTypeId != null && certificateTypeId <= 0) certificateTypeId = null;
 
         if (onlyDepartmentSelected == null) {
             onlyDepartmentSelected =
                     departmentId != null &&
-                    databaseId == null &&
-                    databaseRoleId == null &&
+                    databaseIds == null &&
+                    databaseRoleIds == null &&
                     certificateTypeId == null;
         }
 
         // Фільтр
         ReportFilter filter = new ReportFilter();
         filter.setDepartmentId(departmentId);
-        filter.setDatabaseId(databaseId);
-        filter.setDatabaseRoleId(databaseRoleId);
+        filter.setDatabaseIds(databaseIds);
+        filter.setDatabaseRoleIds(databaseRoleIds);
         filter.setCertificateTypeId(certificateTypeId);
         filter.setExpirationTo(expirationTo);
         filter.setOnlyDepartmentSelected(onlyDepartmentSelected);
@@ -127,8 +127,8 @@ public class ReportsController {
         model.addAttribute("totalPages", totalPages);
 
         model.addAttribute("departmentId", departmentId);
-        model.addAttribute("databaseId", databaseId);
-        model.addAttribute("databaseRoleId", databaseRoleId);
+        model.addAttribute("databaseIds", databaseIds);
+        model.addAttribute("databaseRoleIds", databaseRoleIds);
         model.addAttribute("certificateTypeId", certificateTypeId);
         model.addAttribute("onlyDepartmentSelected", onlyDepartmentSelected);
         model.addAttribute("expirationTo", expirationTo);
@@ -152,8 +152,8 @@ public class ReportsController {
     @GetMapping("/export")
     public void exportToExcel(
             @RequestParam(required = false) Integer departmentId,
-            @RequestParam(required = false) Integer databaseId,
-            @RequestParam(required = false) Integer databaseRoleId,
+            @RequestParam(required = false) List<Integer> databaseIds,
+            @RequestParam(required = false) List<Integer> databaseRoleIds,
             @RequestParam(required = false) Integer certificateTypeId,
             @RequestParam(required = false) Boolean onlyDepartmentSelected,
             @RequestParam(required = false)
@@ -166,22 +166,22 @@ public class ReportsController {
                 .orElseThrow(() -> new IllegalStateException(
                         "Користувач не знайдений: " + principal.getUsername()));
 
-        if (databaseId != null && databaseId <= 0) databaseId = null;
-        if (databaseRoleId != null && databaseRoleId <= 0) databaseRoleId = null;
+        if (databaseIds != null && databaseIds.isEmpty()) databaseIds = null;
+        if (databaseRoleIds != null && databaseRoleIds.isEmpty()) databaseRoleIds = null;
         if (certificateTypeId != null && certificateTypeId <= 0) certificateTypeId = null;
 
         if (onlyDepartmentSelected == null) {
             onlyDepartmentSelected =
                     departmentId != null &&
-                    databaseId == null &&
-                    databaseRoleId == null &&
+                    databaseIds == null &&
+                    databaseRoleIds == null &&
                     certificateTypeId == null;
         }
 
         ReportFilter filter = new ReportFilter();
         filter.setDepartmentId(departmentId);
-        filter.setDatabaseId(databaseId);
-        filter.setDatabaseRoleId(databaseRoleId);
+        filter.setDatabaseIds(databaseIds);
+        filter.setDatabaseRoleIds(databaseRoleIds);
         filter.setCertificateTypeId(certificateTypeId);
         filter.setExpirationTo(expirationTo);
         filter.setOnlyDepartmentSelected(onlyDepartmentSelected);

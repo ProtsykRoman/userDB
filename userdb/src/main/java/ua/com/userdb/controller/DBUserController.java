@@ -153,6 +153,52 @@ public class DBUserController {
 
         return "pages/dbuser/list";
     }
+    
+    @GetMapping("/new")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public String showCreateForm(@AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
+                                 Model model) throws JsonProcessingException {
+
+    	User currentUser = userService
+    	        .findUserByUsername(principal.getUsername())
+    	        .orElseThrow(() -> new RuntimeException("User not found"));
+    	
+    	DBUser dbUser = new DBUser();
+        dbUser.setDbUserAccesses(new ArrayList<>());
+        dbUser.setDbUserCertificates(new ArrayList<>());
+        dbUser.setDbUserRoles(new ArrayList<>());
+
+        model.addAttribute("dbUser", dbUser);
+        model.addAttribute("readOnly", currentUser.getRole() == Role.USER);
+
+        addFormAttributes(model, dbUser, currentUser);
+
+        return "pages/dbuser/form";
+    }
+    
+    @PostMapping
+    public String createDBUser(@ModelAttribute DBUser dbUser, 
+    		@AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
+    		Model model) throws JsonProcessingException  {
+    	
+    	User currentUser = userService
+                .findUserByUsername(principal.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    	
+    	if (dbUser.getIdentificationNumber() != null &&
+    	        dbUserService.existsByIdentificationNumber(dbUser.getIdentificationNumber())) {
+
+    	        model.addAttribute("error",
+    	                "Користувач з таким ідентифікаційним номером вже існує");
+
+    	        model.addAttribute("dbUser", dbUser);
+    	        addFormAttributes(model, dbUser, currentUser);
+    	        return "pages/dbuser/form";
+    	    }
+
+    	    dbUserService.createDBUser(dbUser);
+    	    return "redirect:/dbusers";
+    }
 
     /* =========================================================
        EDIT

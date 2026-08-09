@@ -1,203 +1,257 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz" layout:decorate="~{layout}">
+	xmlns:layout="http://www.ultraq.net.nz" layout:decorate="~{layout}">
 <head>
-    <title layout:fragment="title">Звіти</title>
-    <link rel="stylesheet" th:href="@{/css/reports.css}">
-    <style>
-        /* Стиль для заблокованих полів (сірий колір та заборона кліку) */
-        select:disabled {
-            background-color: #e0e0e0 !important;
-            color: #666 !important;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-    </style>
+<title layout:fragment="title">Звіти</title>
+<link rel="stylesheet" th:href="@{/css/reports.css}">
+<link rel="stylesheet" th:href="@{/css/reports-multiselect.css}">
+
 </head>
 <body>
-<div layout:fragment="content" class="form-container">
-    <h2>Формування звітів</h2>
-    <form th:action="@{/reports}" method="get" id="reportForm">
-        <!-- Перший рядок -->
-        <div class="form-row">
-            <div class="form-group">
-                <label>Область пошуку</label>
-                <select name="onlyDepartmentSelected" id="onlyDepartmentSelected">
-                    <option value="true" th:selected="${onlyDepartmentSelected == true}">Тільки вибраний</option>
-                    <option value="false" th:selected="${onlyDepartmentSelected == false}">Підпорядковані</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Підрозділ</label>
-                <select name="departmentId" id="departmentId">
-                    <option value="">-- всі --</option>
-                    <option th:each="d : ${departments}" th:value="${d.id}"
-                            th:text="${'--'.repeat(d.level) + d.name}"
-                            th:selected="${departmentId == d.id}"></option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Закінчення до</label>
-                <input type="date" name="expirationTo" id="expirationTo" th:value="${param.expirationTo}">
-            </div>
-        </div>
+	<div layout:fragment="content" class="form-container">
+		<h2>Формування звітів</h2>
+		<form th:action="@{/reports}" method="get" id="reportForm">
+			<!-- Перший рядок -->
+			<div class="form-row">
+				<div class="form-group">
+					<label>Область пошуку</label> <select name="onlyDepartmentSelected"
+						id="onlyDepartmentSelected">
+						<option value="true"
+							th:selected="${onlyDepartmentSelected == true}">Тільки
+							вибраний</option>
+						<option value="false"
+							th:selected="${onlyDepartmentSelected == false}">Підпорядковані</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>Підрозділ</label> <select name="departmentId"
+						id="departmentId">
+						<option value="">-- всі --</option>
+						<option th:each="d : ${departments}" th:value="${d.id}"
+							th:text="${'--'.repeat(d.level) + d.name}"
+							th:selected="${departmentId == d.id}"></option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>Закінчення до</label> <input type="date" name="expirationTo"
+						id="expirationTo" th:value="${param.expirationTo}">
+				</div>
+			</div>
 
-        <!-- Другий рядок (Взаємовиключні фільтри) -->
-        <div class="form-row">
-            <div class="form-group">
-                <label>Тип сертифікату</label>
-                <select id="certificateTypeId" name="certificateTypeId">
-                    <option value="">-- всі --</option>
-                    <option th:each="c : ${certificateTypes}" th:value="${c.id}"
-                            th:text="${c.name}" th:selected="${certificateTypeId == c.id}"></option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>База даних</label>
-                <select id="databaseId" name="databaseId">
-                    <option value="">-- всі --</option>
-                    <option th:each="db : ${databases}" th:value="${db.id}"
-                            th:text="${db.name}" th:selected="${databaseId == db.id}"></option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Роль</label>
-                <select id="databaseRoleId" name="databaseRoleId">
-                    <option value="">-- всі --</option>
-                    <option th:each="r : ${databaseRoles}" th:value="${r.id}"
-                            th:text="${r.name + ' (' + r.database.name + ')'}"
-                            th:selected="${databaseRoleId == r.id}"></option>
-                </select>
-            </div>
-        </div>
+			<!-- Другий рядок (Взаємовиключні фільтри) -->
+			<div class="form-row">
+				<div class="form-group">
+					<label>Тип сертифікату</label> <select id="certificateTypeId"
+						name="certificateTypeId">
+						<option value="">-- всі --</option>
+						<option th:each="c : ${certificateTypes}" th:value="${c.id}"
+							th:text="${c.name}" th:selected="${certificateTypeId == c.id}"></option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>Бази даних</label>
 
-        <div class="form-buttons">
-            <button type="submit" class="btn-add">Показати</button>
-            <a th:href="@{/reports}" class="btn-cancel">Очистити</a>
-            <a class="btn-export-excel"
-               th:href="@{/reports/export(
-                   departmentId=${departmentId},
-                   onlyDepartmentSelected=${onlyDepartmentSelected},
-                   databaseId=${databaseId},
-                   databaseRoleId=${databaseRoleId},
-                   certificateTypeId=${certificateTypeId},
-                   expirationTo=${expirationTo}
-               )}">Експорт в Excel</a>
-        </div>
-    </form>
+					<div class="selector-box">
 
-    <!-- Таблиця результатів -->
-    <div th:if="${report != null}">
-        <h3>Результати</h3>
-        <table class="list-table">
-            <thead>
-            <tr>
-                <th>ПІБ</th>
-                <th>Підрозділ</th>
-                <th>Активний</th>
-                <th>Тип</th>
-                <th>Деталі</th>
-                <th>Дата закінчення</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="row : ${report}" th:with="cleanReturnUrl=${returnUrl.replace('page=null','')}">
-                <td><a th:href="@{/dbusers/edit/{id}(id=${row.userId}, returnUrl=${cleanReturnUrl})}"
-                       th:text="${row.userName}"></a></td>
-                <td th:text="${row.departmentName}"></td>
-                <td th:text="${row.isActive ? 'Так' : 'Ні'}"></td>
-                <td th:text="${row.source}"></td>
-                <td>
-                    <span th:if="${row.source == T(ua.com.userdb.dto.ReportSourceType).CERTIFICATE}"
-                          th:text="${row.certificateTypeName}"></span>
-                    <span th:if="${row.source == T(ua.com.userdb.dto.ReportSourceType).ACCESS}"
-                          th:text="${row.databaseName + (row.databaseRoleName != null ? ' / ' + row.databaseRoleName : '')}"></span>
-                </td>
-                <td th:text="${row.expirationDate != null ? #temporals.format(row.expirationDate, 'yyyy-MM-dd') : ''}"></td>
-            </tr>
-            </tbody>
-        </table>
+						<button type="button" id="openDbModal" class="selector-btn">
 
-        <!-- Пагінація -->
-        <div th:with="
-              prevPage=${currentPage > 1 ? currentPage - 1 : 1},
-              nextPage=${currentPage < totalPages ? currentPage + 1 : totalPages},
-              start=${totalRecords == 0 ? 0 : ((currentPage - 1) * pageSize + 1)},
-              end=${T(java.lang.Math).min(currentPage * pageSize, totalRecords)}
-        ">
-            <span th:text="${'Записи ' + start + ' - ' + end + ' з ' + totalRecords}"></span>
+							<span id="dbSelectedText"> Всі бази </span>
 
-            <div class="pagination-buttons">
-                <a th:if="${currentPage > 1}" th:href="@{/reports(page=1,
-                       onlyDepartmentSelected=${onlyDepartmentSelected},
-                       departmentId=${departmentId},
-                       certificateTypeId=${certificateTypeId},
-                       databaseId=${databaseId},
-                       databaseRoleId=${databaseRoleId},
-                       expirationTo=${expirationTo})}">&laquo;&laquo; Початок</a>
+						</button>
 
-                <a th:if="${currentPage > 1}" th:href="@{/reports(page=${prevPage},
-                       onlyDepartmentSelected=${onlyDepartmentSelected},
-                       departmentId=${departmentId},
-                       certificateTypeId=${certificateTypeId},
-                       databaseId=${databaseId},
-                       databaseRoleId=${databaseRoleId},
-                       expirationTo=${expirationTo})}">&laquo; Назад</a>
+					</div>
+				</div>
+				<div class="form-group">
 
-                <a th:if="${currentPage < totalPages}" th:href="@{/reports(page=${nextPage},
-                       onlyDepartmentSelected=${onlyDepartmentSelected},
-                       departmentId=${departmentId},
-                       certificateTypeId=${certificateTypeId},
-                       databaseId=${databaseId},
-                       databaseRoleId=${databaseRoleId},
-                       expirationTo=${expirationTo})}">Вперед &raquo;</a>
+					<label>Ролі</label>
 
-                <a th:if="${currentPage < totalPages}" th:href="@{/reports(page=${totalPages},
-                       onlyDepartmentSelected=${onlyDepartmentSelected},
-                       departmentId=${departmentId},
-                       certificateTypeId=${certificateTypeId},
-                       databaseId=${databaseId},
-                       databaseRoleId=${databaseRoleId},
-                       expirationTo=${expirationTo})}">Кінець &raquo;&raquo;</a>
-            </div>
-        </div>
-    </div>
-</div>
+					<div class="selector-box">
 
-<!-- JS для взаємовиключних фільтрів -->
-<script th:inline="javascript">
-(function() {
-    const initFilterLogic = function() {
-        const cert = document.getElementById('certificateTypeId');
-        const db = document.getElementById('databaseId');
-        const role = document.getElementById('databaseRoleId');
-        const form = document.getElementById('reportForm');
-        if (!cert || !db || !role) return;
+						<button type="button" id="openRoleModal" class="selector-btn">
 
-        function toggleFilters() {
-            cert.disabled = false; db.disabled = false; role.disabled = false;
-            if(cert.value) { db.disabled = true; role.disabled = true; }
-            else if(db.value) { cert.disabled = true; role.disabled = true; }
-            else if(role.value) { cert.disabled = true; db.disabled = true; }
-        }
+							<span id="roleSelectedText"> Всі ролі </span>
 
-        cert.addEventListener('change', toggleFilters);
-        db.addEventListener('change', toggleFilters);
-        role.addEventListener('change', toggleFilters);
+						</button>
 
-        toggleFilters();
+					</div>
 
-        if(form) {
-            form.addEventListener('submit', function() {
-                cert.disabled = false; db.disabled = false; role.disabled = false;
-            });
-        }
-    };
+				</div>
+			</div>
 
-    if(document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initFilterLogic);
-    } else { initFilterLogic(); }
-})();
-</script>
+			<div class="form-buttons">
+				<button type="submit" class="btn-add">Показати</button>
+				<button type="submit" formaction="/reports/export" formmethod="get"
+					class="btn-export-excel">Експорт в Excel</button>
+			</div>
+			<div id="dbModal" class="modal">
+
+				<div class="modal-content">
+
+					<div class="modal-header">Вибір баз даних</div>
+
+					<div class="modal-body">
+
+						<label class="modal-item" th:each="db : ${databases}"> <input
+							type="checkbox" class="db-checkbox" name="databaseIds"
+							th:value="${db.id}"
+							th:checked="${databaseIds != null and #lists.contains(databaseIds, db.id)}">
+
+							<span th:text="${db.name}"></span>
+
+						</label>
+
+					</div>
+
+					<div class="modal-footer">
+
+						<button type="button" id="clearDbSelection" class="btn-cancel">
+							Очистити</button>
+
+						<button type="button" id="applyDbSelection" class="btn-add">
+							ОК</button>
+
+					</div>
+
+				</div>
+
+			</div>
+			<div id="roleModal" class="modal">
+
+				<div class="modal-content">
+
+					<div class="modal-header">Вибір ролей</div>
+
+					<div class="modal-body">
+
+						<input type="text" id="roleSearch" class="role-search"
+							placeholder="Пошук ролі..."> <label
+							th:each="r : ${databaseRoles}" class="modal-item role-item"
+							th:attr="data-db-id=${r.database.id}"> <input
+							type="checkbox" class="role-checkbox" name="databaseRoleIds"
+							th:value="${r.id}"
+							th:checked="${databaseRoleIds != null and #lists.contains(databaseRoleIds, r.id)}">
+
+							<span th:text="${r.name + ' (' + r.database.name + ')'}"></span>
+
+						</label>
+
+					</div>
+
+					<div class="modal-footer">
+
+						<button type="button" id="clearRoleSelection" class="btn-cancel">
+							Очистити</button>
+
+						<button type="button" id="applyRoleSelection" class="btn-add">
+							ОК</button>
+
+					</div>
+
+				</div>
+
+			</div>
+		</form>
+
+		<!-- Таблиця результатів -->
+		<div th:if="${report != null}">
+			<h3>Результати</h3>
+			<table class="list-table">
+				<thead>
+					<tr>
+						<th>ПІБ</th>
+						<th>Підрозділ</th>
+						<th>Активний</th>
+						<th>Тип</th>
+						<th>Деталі</th>
+						<th>Дата закінчення</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="row : ${report}"
+						th:with="cleanReturnUrl=${returnUrl.replace('page=null','')}">
+						<td><a
+							th:href="@{/dbusers/edit/{id}(id=${row.userId}, returnUrl=${cleanReturnUrl})}"
+							th:text="${row.userName}"></a></td>
+						<td th:text="${row.departmentName}"></td>
+						<td th:text="${row.isActive ? 'Так' : 'Ні'}"></td>
+						<td th:text="${row.source}"></td>
+						<td><span
+							th:if="${row.source == T(ua.com.userdb.dto.ReportSourceType).CERTIFICATE}"
+							th:text="${row.certificateTypeName}"></span> <span
+							th:if="${row.source == T(ua.com.userdb.dto.ReportSourceType).ACCESS}"
+							th:text="${row.databaseName + (row.databaseRoleName != null ? ' / ' + row.databaseRoleName : '')}"></span>
+						</td>
+						<td
+							th:text="${row.expirationDate != null ? #temporals.format(row.expirationDate, 'yyyy-MM-dd') : ''}"></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<!-- Пагінація -->
+			<div
+				th:with="
+        prevPage=${currentPage > 1 ? currentPage - 1 : 1},
+        nextPage=${currentPage < totalPages ? currentPage + 1 : totalPages},
+        start=${totalRecords == 0 ? 0 : ((currentPage - 1) * pageSize + 1)},
+        end=${T(java.lang.Math).min(currentPage * pageSize, totalRecords)}
+">
+
+				<span
+					th:text="${'Записи ' + start + ' - ' + end + ' з ' + totalRecords}">
+				</span>
+
+				<div class="pagination-buttons">
+
+					<a th:if="${currentPage > 1}"
+						th:href="@{/reports(
+               page=1,
+               onlyDepartmentSelected=${onlyDepartmentSelected},
+               departmentId=${departmentId},
+               certificateTypeId=${certificateTypeId},
+               databaseIds=${databaseIds},
+               databaseRoleIds=${databaseRoleIds},
+               expirationTo=${expirationTo}
+           )}">
+						&laquo;&laquo; Початок </a> <a th:if="${currentPage > 1}"
+						th:href="@{/reports(
+               page=${prevPage},
+               onlyDepartmentSelected=${onlyDepartmentSelected},
+               departmentId=${departmentId},
+               certificateTypeId=${certificateTypeId},
+               databaseIds=${databaseIds},
+               databaseRoleIds=${databaseRoleIds},
+               expirationTo=${expirationTo}
+           )}">
+						&laquo; Назад </a> <a th:if="${currentPage < totalPages}"
+						th:href="@{/reports(
+               page=${nextPage},
+               onlyDepartmentSelected=${onlyDepartmentSelected},
+               departmentId=${departmentId},
+               certificateTypeId=${certificateTypeId},
+               databaseIds=${databaseIds},
+               databaseRoleIds=${databaseRoleIds},
+               expirationTo=${expirationTo}
+           )}">
+						Вперед &raquo; </a> <a th:if="${currentPage < totalPages}"
+						th:href="@{/reports(
+               page=${totalPages},
+               onlyDepartmentSelected=${onlyDepartmentSelected},
+               departmentId=${departmentId},
+               certificateTypeId=${certificateTypeId},
+               databaseIds=${databaseIds},
+               databaseRoleIds=${databaseRoleIds},
+               expirationTo=${expirationTo}
+           )}">
+						Кінець &raquo;&raquo; </a>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- JS для взаємовиключних фільтрів -->
+	<div layout:fragment="scripts">
+		<script th:src="@{/js/reports-multiselect.js}"></script>
+	</div>
 </body>
 </html>

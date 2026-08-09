@@ -2,6 +2,7 @@ package ua.com.userdb.controller;
 
 import java.util.Optional;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import ua.com.userdb.service.CertificateTypeService;
 
 @Controller
 @RequestMapping("/certificate-types")
+@PreAuthorize("hasRole('ADMIN')")
 public class CertificateTypeController {
 	private CertificateTypeService certificateTypeService;
 	

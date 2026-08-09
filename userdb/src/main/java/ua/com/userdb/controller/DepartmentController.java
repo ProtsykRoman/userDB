@@ -3,6 +3,7 @@ package ua.com.userdb.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import ua.com.userdb.service.DepartmentService;
 
 @Controller
 @RequestMapping("/departments")
+@PreAuthorize("hasRole('ADMIN')")
 public class DepartmentController {
     private final DepartmentService departmentService;
 
